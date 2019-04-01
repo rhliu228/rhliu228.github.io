@@ -230,13 +230,14 @@ this代表的是Observer对象，参数source$代表上游的Observable对象。
 #### 操作符和Observable关联的缺陷
 js模块导入的代码并不都会被执行，打包工具（rollup，webpack等）的Tree shaking主要用于在js代码打包过程中去除无用的死代码，减少js代码的体积。
 RxJS中操作符挂在Observable类上或者Observable.prototype上，赋值给Observable类和Observable.prototype上的某个属性在Tree shaking看来就是就是有用的代码，所以，所有的操作符，不管真实运行时是否被调用，都会被Tree shaking认为是有用的代码，不会被当作死代码删除。
-除此之外，用给Observable打补丁的方式导入操作符，每个文件模块影响的都是全局唯一的那个Observable，极其容易因为代码耦合造成问题。
 比如，代码引入interval和map两个操作符：
 ```
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/map';
 ```
 假如在程序中interval和map并没有被调用过，这两个操作符也不会被当作死代码。
+除此之外，用给Observable打补丁的方式导入操作符，每个文件模块影响的都是全局唯一的那个Observable，极其容易因为代码耦合造成问题。
+
 #### 使用call来创建库
 摒弃给Observable类打补丁的做法，对于静态操作符，直接使用该函数即可，对于实例操作符，使用bind/call方法，让一个操作符只对一个具体的Observable对象生效。
 ```
@@ -328,3 +329,217 @@ result$.subscribe(console.log);
 * catchError
 * switchAll
 * finalize
+
+## 多播
+在RxJs中，Observable和Observer的关系，就是前者在播放内容，后者在收听内容，播放内容的方式可以分为三种：
+* 单播（unicast）
+* 广播（broadcast）
+* 多播（multicast）
+单播是一对一的关系，一个播放者对应一个接听者，广播把消息传播给所有接听者，多播则是有选择性地把消息传递给有需要的接听者。RxJS对单播是绝对支持的，而广播则不是RXJS支持的目标，广播已经有很多现成的解决方法，例如nodeJs中的EventEmitter。
+### Hot和Cold数据流的差异
+如果每一次观察者对Observable对象进行subscribe，都会产生一个全新的数据序列的数据流，这样的Observable对象被称为cold observable。RxJS的大部分创建类操作符创建出来的都是cold observable对象，例如inteval，range等。
+下面是一个单播的例子：
+```
+import {interval} 'rxjs/observable/of';
+import {take} 'rxjs/operators';
+const tick$ = interval(1000).pipe(take(3));
+tick$.subscribe(value=>console.log('observer 1: ' + value));
+setTimeout(() => {
+    tick$.subscribe(value=>console.log('observer 2: ' + value));
+},2000);
+
+//console
+//observer 1: 0
+//observer 1: 1
+//observer 2: 0
+//observer 1: 2
+//observer 2: 1
+//observer 2: 2 
+```
+你可能会以为输出下面的结果：
+```
+//observer 1: 0
+//observer 1: 1
+//observer 2: 1
+//observer 1: 2
+//observer 2: 2 
+```
+但是，interval操作符产生的是一个cold observable对象，每次对上游的subscribe都会产生一个新的生产者。
+而对于一个hot observable，概念上有一个独立于Observable对象的生产者，这个生产者的创建与subscribe的调用没有关系，subscribe的调用只是让Observable对象连接上生产者而已。RxJs中有一些操作符产生的是Hot Observable：
+* fromPromise
+* fromEvent
+* fromEventPattern
+
+这些产生hot observable对象的操作符数据源都在外部，真正的数据源和有没有Observer没有任何关系。而真正的多播，则是不管有多少Observer进行subscribe，推给Observer的数据都是一样的数据源，满足这种条件的，就是hot observable。
+hot observable和cold observable都具有“懒”的性质，两者的数据管道内逻辑都只有订阅者存在时才执行，但是cold Observable更“懒”，如果没有订阅者，连数据都不会真正产生；对于hot observable来说，没有订阅者的情况下，数据依旧产生，只是不传入数据管道。
+所以cold observable实现的是单播，而hot observable实现的是多播。
+### Subject
+有时候，我们也希望对cold observable实现多播。要把一个cold observable对象转换成一个hot observable，并不是去改变cold observable本身，而是产生一个新的observable对象，包装之前的cold observable对象，这样在数据流管道中，新的observable就成为了下游。
+要实现这个转化，很明显需要一个“中间人”做串接的事情：
+* 中间人需要提供subscribe方法，让其他人能够订阅自己的数据源
+* 中间人能够有办法接收推送的数据，包括cold observable推送的数据
+RxJS中，提供了subject类型，subject既有observable的接口，也具有observer的接口。
+```
+import {Subject} from 'rxjs/Subject';
+import {interval} 'rxjs/observable/interval';
+import {map} 'rxjs/operators';
+const subject = new Subject();
+subject.pipe(map(x=>x*2)).subscribe(
+    value => console.log(value),
+    err => console.log(err),
+    () => console.log('on complete')
+);
+subject.next(1);
+subject.next(2);
+subject.complete();
+```
+一个subject对象是一个Observable，所以可以在后面链式调用任何操作符，也可以调用subscribe来添加Observer。
+一个subject对象同时也是一个Observer，所以也支持next，error和complete方法。
+
+### 用Subject实现多播
+```
+import {Subject} from 'rxjs/Subject';
+import {interval} 'rxjs/observable/interval';
+import {map} 'rxjs/operators';
+const tick$ = interval(1000).pipe(take(3));
+const subject = new Subject();
+tick$.subscribe(subject);
+subject.subscribe(value=>console.log('observer 1: ' + value));
+setTimeout(() => {
+    subject.subscribe(value=>console.log('observer 2: ' + value));
+},1500);
+```
+只需要让Subject对象居于cold observable和observer之间。
+但是很可惜subject并不是一个操作符，所以无法链式调用，不过可以创建一个新的操作符来达到链式调用的效果:
+```
+Observable.prototype.makeHot = function() {
+    const cold$ = this;
+    const subject = new Subject();
+    cold$.subscribe(subject);
+    return subject;
+}
+const hotTick$ = interval(1000).pipe(take(3)).makeHot();
+hotTick$.subscribe(value=>console.log('observer 1: ' + value));
+setTimeout(() => {
+    hotTick$.subscribe(value=>console.log('observer 2: ' + value));
+},1500);
+```
+这段代码有个漏洞，可以直接调用makeHot返回的subject对象的next，error或者complete方法来影响下游：
+```
+const hotTick$ = interval(1000).pipe(take(3)).makeHot();
+hotTick$.complete();
+//下面的Observer将不会收到任何消息
+hotTick$.subscribe(value=>console.log('observer 1: ' + value));
+```
+subject对象是不能重复使用的，一个subject对象一旦被调用了complete或者error函数，那么，它作为observable的生命周期也就结束了，后续再想利用这个subject对象传递数据给下游，就像泥牛如大海，没有任何反应。
+为了杜绝这种可能性，对makeHot进行改进，让它返回一个纯粹的Observable对象:
+```
+Observable.prototype.makeHot = function() {
+    const cold$ = this;
+    const subject = new Subject();
+    cold$.subscribe(subject);
+    return Observable.create((observer) => subject.subscribe(observer));
+}
+```
+makeHot并不是直接返回Subject对象，而是返回一个新的Observable对象，这样就避免了subject直接暴露给外部。
+
+subject可以有多个上游，如果一个subject订阅多个数据流，起到的作用就是把多个数据源的内容汇聚到一个observable，但是这种使用方式却可能引发意想不到的结果。假设其中一个上游调用了subject对象的complete函数，那即使其他上游的数据还没推送完，subject也会因为生命周期的结束，无法再把其他数据推送给下游。
+任何一个上游数据的完结或者出错都可以终结subject对象的生命，让subject来做合并数据流的工作并不合适，应该让merge来做。
+当subject有多个observer时，如果某个observer产生了一个错误异常，而且这个异常没有被observer处理，那subject的其他observer都会失败。
+```
+const tick$ = interval(1000).pipe(take(3));
+const subject = new Subject();
+tick$.subscribe(subject);
+const throwOnUnluckyNumber = value => {
+    if(value==4){
+        throw new Error('unlucky number 4');
+    }
+    return value;
+}
+subject.pipe(map(throwOnUnluckyNumber)).subscribe(
+    value=>console.log('observer 1: ' + value)
+)
+subject.subscribe(
+    value=>console.log('observer 2: ' + value),
+    err=>console.log(err)
+)
+```
+1号observer在遇到数字4的时候遇到错误异常，2号observer因为1号observer没有优雅地处理错误，也被牵连，因为subject对象由于下游1号Observer没有处理错误而被破坏了。
+可以想象，Subject为了给所有observer推送数据，会有类似的代码：
+```
+for(let observer of allObservers){
+    observer.next(data);
+}
+```
+为了解决这个问题，好的编程实践是让所有的observer都具备对异常错误的处理。
+```
+subject.pipe(map(throwOnUnluckyNumber)).subscribe(
+    value=>console.log('observer 1: ' + value),
+    err=>console.log('observer 1 on error: ' + err)
+)
+subject.subscribe(
+    value=>console.log('observer 2: ' + value),
+    err=>console.log('observer 2 on error: ' + err)
+)
+```
+### 支持多播的操作符
+RxJs提供了支持多播的一系列操作符，其中最基础的是
+* multicast
+* share 
+* publish
+1. multicast是一个实例操作符，能够以上游的Observable为数据源产生一个新的hot observable对象：
+```
+const hotSource$ = coldSource$.multicast(new Subject);
+```
+multicast接收一个subject对象或者一个返回subject对象的函数（可以在subject对象生命终结时重新subscribe上游）作为参数，
+返回的是一个Observable对象，不过这个对象比较特殊，是Observable子类ConnectableObservable的实例对象。这种对象包含一个connect函数，connect的作用是
+触发multicast用Subject对象去订阅上游的Observable，如果不调用这个函数，这个ConnectableObservable将不会从上游那里得到任何数据。
+除此之外，ConnectableObservable还支持自动计数，对Observer的个数进行计数，当第一个Observer对象被添加时，主动去订阅上游，当最后一个Observer退订时，就让中间人
+Subject退订上游的Cold Observable。这个功能可以借助ConnectableObservable对象的函数refCount实现。
+除了第一个参数指定一个Subject对象或者指定一个产生Subject对象的工厂方法，multicast还支持第二个参数：selector，这个参数是一个可选参数，它可以使用上游数据任意多次，但不会重复订阅上游数据流。
+一旦指定selector参数，multicast将不会返回ConnectableObservable对象，而是用selector函数来产生一个Observable对象。
+selector函数有一个参数shared，这个参数就是multicast第一个参数代表的Subject或者使用工厂方法返回的Subject对象。
+```
+const coldSource$ = interval(1000).pipe(take(3));
+const selector = shared => {
+    return shared.pipe(concat(of('done)));
+}
+const tick$ = coldSource$.pipe(multicast(new Subject(),selector));
+tick$.subscribe(
+    value=>console.log('observer 1: ' + value),
+    err=>console.log('observer 1 on error: ' + err)
+);
+setTimeout(() => {
+    tick$.subscribe(
+        value=>console.log('observer 2: ' + value),
+        err=>console.log('observer 2 on: error: ' + err)
+    );
+});
+//console
+//observer 1: 0
+//observer 1: 1
+//observer 1: 2
+//observer 1: done
+//observer 2: done
+```
+2. publish完全是通过multicast来实现的
+```
+function(selector){
+    if(selector){
+        return this.multicast(()=>new Subject(),selector);
+    }else{
+        return this.multicast(new Subject);
+    }
+}
+```
+3.  shared完全是通过multicast来实现的
+```
+Observable.prototype.shared = function shared() {
+    return this.multicast(() => new Subject()).refCount();
+}
+```
+除了以上这几个基础的多播操作符外，RxJS还支持三个高级多播操作符：
+* publishList
+* publishReplay
+* publishBehavior
+关于它们的使用可以自行查阅官网
