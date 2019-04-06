@@ -133,15 +133,13 @@ setTimeout(() => {
 ### 操作符分类
 #### 功能分类
 根据功能，操作符可以分为以下类别
-* 创建类
-* 转化类
-* 过滤类
-* 合并类
-* 多播类
-* 错误处理类
-* 辅助工具类
-* 条件分支类
-* 数学和合计类
+* 创建类，包括create, of, range, generate, repeat和repeatWhen, empty, throw, never, inteval和timer, from, from Promise, from event和fromEventPattern, ajax, defer.
+* 转化类，包括map, mapTo, pluck, windowTime、 windowCount、windowWhen、windowToggle、和window, bufferTime、bufferCount、bufferWhen、bufferToggle和buffer, concatMap、mergeMap、switchMap、exhaustMap, scan和mergeScan
+* 过滤类，包括filter, first, last, take, takeLast, takeWhile和takeUntil, skip, skipwhile和skipUntil, throttleTime、debouceTime和auditTime, throttle、debouce和audit, sample和sampleTime, distnct, distinctUntilChanged和distinctUntilKeyChanged, ignoreElements, elementAt, single
+* 合并类，包括concat和concatAll, merge和mergeAll, zip和zipAll, combineLatest、combineAll和withLatestFrom, race, startWith, forkJoin, switch和exhaust
+* 多播类，包括multicast, publishLast, publishReplay, publishBehavior
+* 错误处理类，包括catch, retry和retryWhen, finally
+* 辅助工具类，包括concat, max和min, Reduce, every, find和findIndex, isEmpty, defaultEmpty
 
 #### 静态和实例分类
   操作符还可以从存在形式进行分类，具体来说就是操作符的实现函数和Observable类的关系。对于定义在Observable类的静态函数，我们称之为静态操作符，而定义在由Observable类prototype属性指向的原型对象上的实例函数，则被称为实例操作符。在链式调用中，静态操作符只能出现在首位，而实例操作符可以出现在任何位置。有些操作符既可以作为Observable类的静态方法，又可以作为Observable对象的实例方法，比如merge。（此处涉及javascript的原型链知识以及es6的class，建议不太了解的读者查阅其他资料了解）
@@ -336,6 +334,7 @@ result$.subscribe(console.log);
 * 广播（broadcast）
 * 多播（multicast）
 单播是一对一的关系，一个播放者对应一个接听者，广播把消息传播给所有接听者，多播则是有选择性地把消息传递给有需要的接听者。RxJS对单播是绝对支持的，而广播则不是RXJS支持的目标，广播已经有很多现成的解决方法，例如nodeJs中的EventEmitter。
+
 ### Hot和Cold数据流的差异
 如果每一次观察者对Observable对象进行subscribe，都会产生一个全新的数据序列的数据流，这样的Observable对象被称为cold observable。RxJS的大部分创建类操作符创建出来的都是cold observable对象，例如inteval，range等。
 下面是一个单播的例子：
@@ -543,3 +542,15 @@ Observable.prototype.shared = function shared() {
 * publishReplay
 * publishBehavior
 关于它们的使用可以自行查阅官网
+
+## 总结
+《深入浅出RxJS》这本书较为系统的介绍了RxJS的核心特性和各类操作符，并且书该书结合弹珠图，将代码例子形象生动地描述清楚，给读者提供了很好的入门教程。个人觉得从书中前三章中得到的收获最大，从中了解到RxJS的代码架构、函数式编程的理念和如何实现操作符。后面介绍操作符用途的章节略显冗长，不过其中有些代码的例子特别贴切和生动，让人有眼前一亮的快感。可以看出作者对RxJS各类操作符的了解是非常深刻的。
+  例如，讲解RxJS的高阶observable，所谓高阶，指的是该Observable返回的依旧是Observable，这样能够管理多个数据流，将管理数据和管理数据流归一化，类似于高阶函数，高阶函数的参数或者返回值是一个函数。这时就需要一些操作符能够组合或者处理这些高阶Observable，将其“砸平”，常见的有合并类高阶操作符concatAll，mergeAll，以及高阶的map等。
+为了说明高阶map运算符concatMap的用途，作者列举了实现网页拖拽的例子。网页应用中，拖拽就是用户的鼠标在某个dom元素上按下去，然后拖动这个元素，最后松开鼠标的过程，这个过程是重复的，拖拽涉及的事件包括
+mousedown，mouseup和mousemove，使用传统方式，基本上就是当mousedown事件发生时，用一个变量标识当前进入拖拽状态，然后监听mousemove事件，移动dom元素位置，当mouseup事件发生时，改变状态变量使之标记为“离开拖拽”，等待下一次mousedown事件的发生。
+这个过程可以看成是多个由mousedown事件引发的数据流序列，每个序列内部又是以mouseup结束的mousemove数据序列。这些序列相互之间不可能交叉重复，这时可以考虑使用高阶map操作符concatMap实现这个例子。详细的代码可参考[concatMap example](https://github.com/mocheng/dissecting-rxjs/blob/master/chapter-08/transform/src/concatMap/drag_drop.html)
+  RxJS还有一些非常有意思的特性，包括Scheduler，单元测试等，这些并未在这篇博客中体现，读者可以根据自身需要去了解。
+  可以得出，只有在项目中使用RxJS，经过大量实践，才能真正掌握RxJS这套工具。我乖乖地合上了这本书，打算找个项目练练手去了。
+
+## 版本
+《深入浅出RxJS》这本书的代码依赖的是RxJs v5.5.0之前的版本，大部分操作符都是采用给Observable类打补丁的形式引用的，我在尝试看这本书的时候，RxJS的版本已经是V6.3.3了，在该版本中，将打补丁的形式完全移除，将所有实例操作符改成了pipeable操作符，其目录存放在"rxjs/operators"，静态操作符直接使用，其目录就在"rxjs/index.js"。
