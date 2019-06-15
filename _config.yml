@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: Zoe的博客
 subtitle:
 description:
 keywords:
-author: John Doe
+author: Liu.Runhua
 language: zh-Hans
 timezone:
 
@@ -15,15 +15,15 @@ timezone:
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://rhliu228.github.io./
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :title/
 permalink_defaults:
 
 # Directory
 source_dir: source
 public_dir: public
-tag_dir: tags
-archive_dir: archives
-category_dir: categories
+tag_dir: blog/tags
+archive_dir: blog/archives
+category_dir: blog/categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: material-x
 plugin:
 - hexo-generator-feed
 #Feed Atom
