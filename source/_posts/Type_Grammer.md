@@ -1,0 +1,2 @@
+大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number。
+Javascript
