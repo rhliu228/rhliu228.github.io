@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <title>JS的类型和特殊值 | Zoe的博客</title>
+  
+  
+
+  
+  <link rel="alternate" href="/atom.xml" title="Zoe的博客">
+  
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.6.3/css/all.min.css">
+  
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.5/css/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class="cover post half">
+      
+        
+  <h1 class="title">Liu.Runhua</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder>
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class="menu navgation">
+  <ul class="h-list">
+    
+      
+        <li>
+          <a class="nav home" href="/" id="home">
+            <i class="fas fa-rss fa-fw"></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/projects/" id="projects">
+            <i class="fas fa-code-branch fa-fw"></i>&nbsp;项目
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/" rel="nofollow" id="friends">
+            <i class="fas fa-link fa-fw"></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/" rel="nofollow" id="about">
+            <i class="fas fa-info-circle fa-fw"></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class="wrapper">
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href="/">
+        
+          Zoe的博客
+        
+      </a>
+			<div class="menu navgation">
+				<ul class="h-list">
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/blog/categories/" rel="nofollow" id="blogcategories">
+									<i class="fas fa-folder-open fa-fw"></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/blog/tags/" rel="nofollow" id="blogtags">
+									<i class="fas fa-hashtag fa-fw"></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/blog/archives/" rel="nofollow" id="blogarchives">
+									<i class="fas fa-archive fa-fw"></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索">
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class="switcher h-list">
+				
+					<li class="s-search"><a class="fas fa-search fa-fw" href="javascript:void(0)"></a></li>
+				
+				<li class="s-menu"><a class="fas fa-bars fa-fw" href="javascript:void(0)"></a></li>
+			</ul>
+		</div>
+
+		<div class="nav-sub container container--flex">
+			<a class="logo flat-box"></a>
+			<ul class="switcher h-list">
+				<li class="s-comment"><a class="flat-btn fas fa-comments fa-fw" href="javascript:void(0)"></a></li>
+        
+          <li class="s-toc"><a class="flat-btn fas fa-list fa-fw" href="javascript:void(0)"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/" id="home">
+								<i class="fas fa-clock fa-fw"></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/blog/archives/" rel="nofollow" id="blogarchives">
+								<i class="fas fa-archive fa-fw"></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/" id="projects">
+								<i class="fas fa-code-branch fa-fw"></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/" rel="nofollow" id="friends">
+								<i class="fas fa-link fa-fw"></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/" rel="nofollow" id="about">
+								<i class="fas fa-info-circle fa-fw"></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class="l_main">
+  
+
+  
+    <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+      
+
+
+  <section class="meta">
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/Type_Value/">
+        JS的类型和特殊值
+      </a>
+    </h1>
+  
+
+
+      
+      <div class="new-meta-box">
+        
+          
+        
+          
+            
+  <div class="new-meta-item author">
+    <a href="https://rhliu228.github.io." rel="nofollow">
+      
+        <i class="fas fa-user" aria-hidden="true"></i>
+      
+      <p>Liu.Runhua</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class="notlink">
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2019-06-22</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class="notlink">
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+      <section class="article typo">
+        <div class="article-entry" itemprop="articleBody">
+          <p>大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言类型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number、symbol。<br>Javascript中的变量是没有类型的，只有值才有。变量可以随时持有任何类型的值。<br><a id="more"></a></p>
+<h5 id="1-undefined和undeclared"><a href="#1-undefined和undeclared" class="headerlink" title="1. undefined和undeclared"></a>1. undefined和undeclared</h5><p>已在作用域中声明但是还没有赋值的变量，是undefined的；相反，还没有在作用域中声明过的变量，是undeclared的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a;</span><br><span class="line">a;   // undefined</span><br><span class="line">b;   // ReferenceError: b is not defined</span><br></pre></td></tr></table></figure></p>
+<p>这里 b is not defined 很容易让人以为是“b is undefined”,这里显示为为“b is not declared”会更准确。<br>更让人抓狂的是typeof处理undeclared变量的方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a;</span><br><span class="line">typeof a;   // undefined</span><br><span class="line">typeof b;   // undefined</span><br></pre></td></tr></table></figure></p>
+<p>对于undeclared的变量，typeof居然返回“undefined”。b虽然是一个undeclared的变量，但是typeof b并没有报错，这是因为typeof有一个特殊的安全防范机制。<br>然而，typeof的安全机制对于在浏览器中运行的js代码来说还是很有用处的，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 这样会报错</span><br><span class="line">if(DEBUG)&#123;</span><br><span class="line">    console.log(&apos;debug mode&apos;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这样是安全的</span><br><span class="line">if(typeof DEBUG !== &apos;undefined) &#123;</span><br><span class="line">    console.log(&apos;debug mode&apos;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>还有要为某个缺失的功能编写polyfill：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if(typeof atob === &apos;undefined&apos;) &#123;</span><br><span class="line">    //这里没有用var声明变量</span><br><span class="line">    atob = function() &#123;/** */&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果在if语句里声明var atob，因为存在变量声明提升，该声明会被提升到作用域最顶层，即使if语句条件不成立也是如此（即浏览器本来就支持atob）。在某些浏览器中，对于特殊的内置全局变量（宿主对象），这样的重复声明会报错。<br>还可以通过判断某个全局变量是否是全局对象的属性来避免undeclared变量的判断出错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(!window.atob) &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>与undeclared变量不同，访问不存在的对象属性不会产生Reference error。</p>
+<h5 id="2-字符串"><a href="#2-字符串" class="headerlink" title="2. 字符串"></a>2. 字符串</h5><p>JS中的字符串是不可变的，但是数组是可变的。字符串不可变是指字符串的成员函数不会改变其原始值，而是创建并返回一个新的字符串，而数组的成员函数都是在其原始值上进行操作。<br>可以借用数组的非变异函数来处理字符串：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a = &apos;foo&apos;;</span><br><span class="line">var c = Array.prototype.join.call(a,&quot;-&quot;);  //f-o-o</span><br><span class="line">var d = Array.prototype.map.call(a,function(v)&#123;</span><br><span class="line">    return v.toUpperCase() + &quot;.&quot;;</span><br><span class="line">&#125;);   //&quot;F.O.O.&quot;</span><br></pre></td></tr></table></figure></p>
+<p>但是无法借用数组的变异函数来处理字符串，例如reverse，push等。为了实现字符串反转，可以：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var c = a.split(&quot;&quot;).reverse().join(&quot;&quot;);</span><br></pre></td></tr></table></figure></p>
+<p>JS的数组变异函数包括： </p>
+<ul>
+<li>push()</li>
+<li>pop()</li>
+<li>shift()</li>
+<li>unshift()</li>
+<li>splice()</li>
+<li>sort()</li>
+<li>reverse()</li>
+</ul>
+<h5 id="3-undefined和null"><a href="#3-undefined和null" class="headerlink" title="3. undefined和null"></a>3. undefined和null</h5><p>undefined类型只有一个值，即undefined，null类型也只有一个值，即null；它们的名称既是类型也是值。它们之间有一些细微的区别：</p>
+<ul>
+<li>null指空值，undefined指没有值</li>
+<li>undefined指从未赋值，null指曾经赋过值，但目前没有值</li>
+</ul>
+<p>null是一个特殊关键字，不是标识符，不能被当作变量来使用和赋值，而undefined是一个标识符，可以被当作变量来使用和赋值。<br>3.1 在非严格模式下，我们可以为全局标识符undefined赋值，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">undefined = 2;   //ugly</span><br><span class="line"></span><br><span class="line">&quot;use strict&quot;;</span><br><span class="line">undefined = 2;  //TypeError</span><br></pre></td></tr></table></figure></p>
+<p>3.2 在非严格和严格模式下，可以声明一个局部变量undefined：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var undefined = 2;</span><br><span class="line">console.log(undefined);  //ugly</span><br></pre></td></tr></table></figure></p>
+<p>3.3 undefined是一个内置标识符，它的值为undefined，通过void运算符即可得到该值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a = 2;</span><br><span class="line">console.log(void a, a);  //undefined 2</span><br></pre></td></tr></table></figure></p>
+<p>利用void运算符可以让表示式不返回任何结果，例如用于函数return语句中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function foo() &#123;</span><br><span class="line">    //...</span><br><span class="line">    return void setTimout(dosomething, 500);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="4-NaN"><a href="#4-NaN" class="headerlink" title="4. NaN"></a>4. NaN</h5><p>js中有一个特殊的数字：NaN。NaN的含义是“Not a number”，如果数字运算的操作数不是数字，就无法返回一个有效的数字，这种情况下应该返回NaN。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a = 2/&apos;foo&apos;;  // NaN</span><br><span class="line">typeof a === &apos;number&apos;;  // true</span><br></pre></td></tr></table></figure></p>
+<p>NaN是唯一一个非自反的值，即NaN !== NaN 为true。既然无法对NaN进行比较，那如何判断一个值是否是NaN呢?可以利用window对象内置的isNaN()方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">isNaN(a);  //true</span><br></pre></td></tr></table></figure></p>
+<p>但是这样方法有一个缺陷，它的检查方式是检查参数是否不是NaN，也不是数字。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a = 2/&apos;foo&apos;;</span><br><span class="line">var b = &apos;foo&apos;;</span><br><span class="line">window.isNaN(a);  // true</span><br><span class="line">window.isNaN(b);  // true</span><br></pre></td></tr></table></figure></p>
+<p>从ES6开始可以用Number.isNaN()检测，这个方法会避免上面的bug，其polyfill如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if(!Number.isNaN) &#123;</span><br><span class="line">    Number.isNaN = function(n) &#123;</span><br><span class="line">        return typeof n === &apos;number&apos; &amp;&amp;</span><br><span class="line">        window.isNaN(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//更简单的方法</span><br><span class="line">if(!Number.isNaN) &#123;</span><br><span class="line">    Number.isNaN = function(n) &#123;</span><br><span class="line">        return n!==n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="5-零值"><a href="#5-零值" class="headerlink" title="5. 零值"></a>5. 零值</h5><p>Javascript中有一个常规的0（也叫做+0）和-0。<br>-0除了可以用作常量之外，也可以是某些数学运算的返回值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a = 0 / -3; //-0</span><br><span class="line">var b = 0 * -3; //-0</span><br></pre></td></tr></table></figure></p>
+<p>加法和减法运算不会得到-0。有时候数学运算的符号位用来表示移动方向等信息。此时如果一个值为0的变量失去了它的符号位，它的方向信息就会丢失，这是-0存在的意义。<br>根据规范，对负零进行字符串操作会返回“0”：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var a = 0 / -3;</span><br><span class="line">console.log(a);  // &quot;-0&quot;</span><br><span class="line"></span><br><span class="line">//但是规范定义的返回结果是这样：</span><br><span class="line">a.toString(); //&quot;0&quot;</span><br><span class="line">a+&quot;&quot;;         //&quot;0&quot;</span><br><span class="line">String(a);    //&quot;0&quot;</span><br><span class="line">JSON.stringify(a); //&quot;0&quot;</span><br></pre></td></tr></table></figure></p>
+<p>此外， 0与-0进行===比较时会返回true，为了区分二者，需要做一些特殊处理：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function isNegZero(n) &#123;</span><br><span class="line">    n = Number(n);</span><br><span class="line">    return (n===0) &amp;&amp; (1/n===-Infinity)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="6-特殊等式"><a href="#6-特殊等式" class="headerlink" title="6. 特殊等式"></a>6. 特殊等式</h5><p>NaN和-0在相等比较时表现特殊，es6加入了Object.is()来判断两个值是否绝对相等，可以用来处理上述的特殊情况：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">if(!Object.is) &#123;</span><br><span class="line">    Object.is = function(v1, v2) &#123;</span><br><span class="line">        //判断是否是-0</span><br><span class="line">        if(v1===0 &amp;&amp; v2===0)&#123;</span><br><span class="line">            return 1/v1 === 1/v2;</span><br><span class="line">        &#125;</span><br><span class="line">        //判断是否是NaN</span><br><span class="line">        if(v1 !== v1) &#123;</span><br><span class="line">            return v2 !== v2;</span><br><span class="line">        &#125;</span><br><span class="line">        return v1 === v2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意，能使用==和===就不要使用Object.is(),因为前者效率更高，更为通用。Object.is主要用来处理那些特殊的相等比较。</p>
+<h5 id="7-值和引用"><a href="#7-值和引用" class="headerlink" title="7. 值和引用"></a>7. 值和引用</h5><p>在许多编程语言中，赋值和参数传递可以通过值复制或者引用复制的方法来完成，取决于使用的语法。但是在JS中，对值和引用的复制完全根据值的类型来决定，在语法上没有任何区别:<br><strong>简单值总是通过值复制的方式来赋值/传递；复合值总是通过引用复制的方式赋值或者传递。</strong><br>例如：<br>在c语言中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">void swap(int &amp;x, int &amp;y) &#123;</span><br><span class="line">    int temp;</span><br><span class="line">    temp = x;</span><br><span class="line">    x = y;</span><br><span class="line">    y = temp;</span><br><span class="line">&#125;</span><br><span class="line">main() &#123;</span><br><span class="line">    int a =1, b =2;</span><br><span class="line">    swap(a,b);</span><br><span class="line">    cout&lt;&lt;&quot;a=&quot;&lt;&lt;a&lt;&lt;&quot;b=&quot;&lt;&lt;b&lt;&lt;&quot;\n&quot;;</span><br><span class="line">    return 1;</span><br><span class="line">&#125;</span><br><span class="line">//输出 a=2 b=1</span><br></pre></td></tr></table></figure></p>
+<p>传引用调用实际上在形参位置插入的是变量本身，即值的内存位置。由于程序变量是作为内存位置来实现的，所以这些内存位置就是变量。引用相当于变量的<strong>别名</strong>，本身并不单独分配自己的内存空间，二者指向的是同一处内存。<br>而在JS中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function foo(x) &#123;</span><br><span class="line">    x.push(4);</span><br><span class="line">    x; //[1,2,3,4]</span><br><span class="line">    x = [4,5,6];</span><br><span class="line">    x.push(7);</span><br><span class="line">    x; //[4,5,6,7]</span><br><span class="line">&#125;</span><br><span class="line">var a = [1,2,3];</span><br><span class="line">foo(a);</span><br><span class="line">a; //[1,2,3,4]</span><br></pre></td></tr></table></figure></p>
+<p>向函数传递a的时候，实际是将引用a的复本赋值给x，刚开始x和a指向的是同一处内存，所以x.push(4)改变的是同一个值。随后x不再指向数组[1,2,3,4],而是指向新分配的内存[4,5,6]。因为数组是复合值，所以这里默认采用引用赋值，不需要特殊的语法。</p>
+
+        </div>
+        
+          
+
+
+  <section class="meta" id="footer-meta">
+    <hr>
+    <div class="new-meta-box">
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-06-24T23:02:46+08:00">
+  <a class="notlink">
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>最后更新于 Jun 24, 2019</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer" href="http://connect.qq.com/widget/shareqq/index.html?url=https://rhliu228.github.io./Type_Value/&title=JS的类型和特殊值 | Zoe的博客&summary=大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言类型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number、symbol。Javascript中的变量是没有类型的，只有值才有。变量可以随时持有任何类型的值。">
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://rhliu228.github.io./Type_Value/&title=JS的类型和特殊值 | Zoe的博客&summary=大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言类型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number、symbol。Javascript中的变量是没有类型的，只有值才有。变量可以随时持有任何类型的值。">
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer" href="http://service.weibo.com/share/share.php?url=https://rhliu228.github.io./Type_Value/&title=JS的类型和特殊值 | Zoe的博客&summary=大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言类型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number、symbol。Javascript中的变量是没有类型的，只有值才有。变量可以随时持有任何类型的值。">
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+        
+        
+            <div class="prev-next">
+                
+                
+                    <section class="next">
+                        <span class="art-item-right" aria-hidden="true">
+                            <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                            <h4>
+                                <a href="/CharacterEncoding/" rel="prev" title="字符编码归纳">
+                                    
+                                        字符编码归纳
+                                    
+                                </a>
+                            </h4>
+                            
+                                
+                                <h6 class="tags">
+                                    <a class="tag" href="/blog/tags/Character-Encoding/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>Character Encoding</a>
+                                </h6>
+                            
+                        </span>
+                    </section>
+                
+            </div>
+        
+      </section>
+    </article>
+  
+
+  
+    <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+  
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: 'JS的类型和特殊值',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class="l_side">
+  
+    
+    
+      
+        
+          
+          
+            <section class="widget author">
+  <div class="content pure">
+    
+      <div class="avatar">
+        <img class="avatar" src="https://cdn.jsdelivr.net/gh/rhliu228/assets@master/avator/avator.jpg">
+      </div>
+    
+    
+    
+      <div class="social-wrapper">
+        
+          
+            <a href="/atom.xml" class="social fas fa-rss flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+            </a>
+          
+        
+          
+            <a href="mailto:me@liurunhua.com" class="social fas fa-envelope flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+            </a>
+          
+        
+          
+            <a href="https://music.163.com/#/user/home?id=117352157" class="social fas fa-headphones-alt flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+            </a>
+          
+        
+      </div>
+    
+  </div>
+</section>
+
+          
+        
+      
+        
+          
+          
+            
+  <section class="widget toc-wrapper">
+    
+<header class="pure">
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <div class="wrapper"><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer" href="javascript:void(0)"><i class="fas fa-thumbtack fa-fw"></i></a></div>
+  
+</header>
+
+    <div class="content pure">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-undefined和undeclared"><span class="toc-text">1. undefined和undeclared</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-字符串"><span class="toc-text">2. 字符串</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-undefined和null"><span class="toc-text">3. undefined和null</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-NaN"><span class="toc-text">4. NaN</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-零值"><span class="toc-text">5. 零值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-特殊等式"><span class="toc-text">6. 特殊等式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#7-值和引用"><span class="toc-text">7. 值和引用</span></a></li></ol>
+    </div>
+  </section>
+
+
+          
+        
+      
+        
+          
+          
+            <section class="widget grid">
+  
+<header class="pure">
+  <div><i class="fas fa-map-signs fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;站内导航</div>
+  
+</header>
+
+  <div class="content pure">
+    <ul class="grid navgation">
+      
+        <li><a class="flat-box" title="/" href="/" id="home">
+          
+            <i class="fas fa-clock fa-fw" aria-hidden="true"></i>
+          
+          近期文章
+        </a></li>
+      
+        <li><a class="flat-box" title="/blog/archives/" href="/blog/archives/" rel="nofollow" id="blogarchives">
+          
+            <i class="fas fa-archive fa-fw" aria-hidden="true"></i>
+          
+          文章归档
+        </a></li>
+      
+        <li><a class="flat-box" title="/projects/" href="/projects/" id="projects">
+          
+            <i class="fas fa-code-branch fa-fw" aria-hidden="true"></i>
+          
+          开源项目
+        </a></li>
+      
+        <li><a class="flat-box" title="/friends/" href="/friends/" rel="nofollow" id="friends">
+          
+            <i class="fas fa-link fa-fw" aria-hidden="true"></i>
+          
+          我的友链
+        </a></li>
+      
+        <li><a class="flat-box" title="/about/" href="/about/" rel="nofollow" id="about">
+          
+            <i class="fas fa-info-circle fa-fw" aria-hidden="true"></i>
+          
+          关于小站
+        </a></li>
+      
+    </ul>
+  </div>
+</section>
+
+          
+        
+      
+        
+          
+          
+            
+
+          
+        
+      
+        
+          
+          
+            
+  <section class="widget tagcloud">
+    
+<header class="pure">
+  <div><i class="fas fa-fire fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;热门标签</div>
+  
+    <a class="rightBtn" rel="nofollow" href="/blog/tags/" title="blog/tags/">
+    <i class="fas fa-expand-arrows-alt fa-fw"></i></a>
+  
+</header>
+
+    <div class="content pure">
+      <a href="/blog/tags/Character-Encoding/" style="font-size: 14px; color: #999">Character Encoding</a> <a href="/blog/tags/函数式编程/" style="font-size: 14px; color: #999">函数式编程</a> <a href="/blog/tags/响应式/" style="font-size: 14px; color: #999">响应式</a>
+    </div>
+  </section>
+
+
+          
+        
+      
+        
+          
+          
+            
+
+
+  <section class="widget music">
+    
+<header class="pure">
+  <div><i class="fas fa-compact-disc fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;最近在听</div>
+  
+    <a class="rightBtn" rel="external nofollow noopener noreferrer" target="_blank" href="https://music.163.com/#/user/home?id=117352157" title="https://music.163.com/#/user/home?id=117352157">
+    <i class="far fa-heart fa-fw"></i></a>
+  
+</header>
+
+    <div class="content pure">
+      
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.7.0/dist/APlayer.min.css">
+  <div class="aplayer" data-theme="#1BCDFC" data-mode="circulation" data-server="netease" data-type="playlist" data-id="117352157" data-volume="0.7">
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/aplayer@1.7.0/dist/APlayer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/meting@1.1.0/dist/Meting.min.js"></script>
+
+
+    </div>
+  </section>
+
+
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="/atom.xml" class="social fas fa-rss flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="mailto:me@liurunhua.com" class="social fas fa-envelope flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://music.163.com/#/user/home?id=117352157" class="social fas fa-headphones-alt flat-btn" target="_blank" rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Zoe的博客</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://img.vim-cn.com/6d/a0c9e6f9efad8b731cb7376504bd10d79d2053.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://img.vim-cn.com/6d/a0c9e6f9efad8b731cb7376504bd10d79d2053.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.5/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.5/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>
