@@ -32,7 +32,7 @@ if(typeof DEBUG !== 'undefined) {
 
 还有要为某个缺失的功能编写polyfill：
 ```
-if(typeof atob === 'undefi*ned') {
+if(typeof atob === 'undefined') {
     //这里没有用var声明变量
     atob = function() {/** */}
 }
@@ -64,3 +64,112 @@ var d = Array.prototype.map.call(a,function(v){
 ```
 var c = a.split("").reverse().join("");
 ```
+
+##### 3. undefined和null
+undefined类型只有一个值，即undefined，null类型也只有一个值，即null；它们的名称既是类型也是值。它们之间有一些细微的区别：
+* null指空值，undefined指没有值
+* undefined指从未赋值，null指曾经赋过值，但目前没有值
+
+null是一个特殊关键字，不是标识符，不能被当作变量来使用和赋值，而undefined是一个标识符，可以被当作变量来使用和赋值。
+3.1 在非严格模式下，我们可以为全局标识符undefined赋值，
+```
+undefined = 2;   //ugly
+
+"use strict";
+undefined = 2;  //TypeError
+```
+3.2 在非严格和严格模式下，可以声明一个局部变量undefined：
+```
+var undefined = 2;
+console.log(undefined);  //ugly
+```
+3.3 undefined是一个内置标识符，它的值为undefined，通过void运算符即可得到该值。
+```
+var a = 2;
+console.log(void a, a);  //undefined 2
+```
+利用void运算符可以让表示式不返回任何结果，例如用于函数return语句中。
+```
+function foo() {
+    //...
+    return void setTimout(dosomething, 500);
+}
+```
+##### 4. NaN
+js中有一个特殊的数字：NaN。NaN的含义是“Not a number”，如果数字运算的操作数不是数字，就无法返回一个有效的数字，这种情况下应该返回NaN。
+```
+var a = 2/'foo';  // NaN
+typeof a === 'number';  // true
+```
+NaN是唯一一个非自反的值，即NaN !== NaN 为true。既然无法对NaN进行比较，那如何判断一个值是否是NaN呢?可以利用window对象内置的isNaN()方法。
+```
+isNaN(a);  //true
+```
+但是这样方法有一个缺陷，它的检查方式是检查参数是否不是NaN，也不是数字。
+```
+var a = 2/'foo';
+var b = 'foo';
+window.isNaN(a);  // true
+window.isNaN(b);  // true
+```
+从ES6开始可以用Number.isNaN()检测，这个方法会避免上面的bug，其polyfill如下： 
+```
+if(!Number.isNaN) {
+    Number.isNaN = function(n) {
+        return typeof n === 'number' &&
+        window.isNaN(n);
+    }
+}
+//更简单的方法
+if(!Number.isNaN) {
+    Number.isNaN = function(n) {
+        return n!==n;
+    }
+}
+```
+
+##### 5. 零值
+Javascript中有一个常规的0（也叫做+0）和-0。
+-0除了可以用作常量之外，也可以是某些数学运算的返回值：
+```
+var a = 0 / -3; //-0
+var b = 0 * -3; //-0
+```
+加法和减法运算不会得到-0。有时候数学运算的符号位用来表示移动方向等信息。此时如果一个值为0的变量失去了它的符号位，它的方向信息就会丢失，这是-0存在的意义。
+根据规范，对负零进行字符串操作会返回“0”：
+```
+var a = 0 / -3;
+console.log(a);  // "-0"
+
+//但是规范定义的返回结果是这样：
+a.toString(); //"0"
+a+"";         //"0"
+String(a);    //"0"
+JSON.stringify(a); //"0"
+```
+此外， 0与-0进行===比较时会返回true，为了区分二者，需要做一些特殊处理：
+```
+function isNegZero(n) {
+    n = Number(n);
+    return (n===0) && (1/n===-Infinity)
+}
+```
+
+##### 6. 特殊等式
+NaN和-0在相等比较时表现特殊，es6加入了Object.is()来判断两个值是否绝对相等，可以用来处理上述的特殊情况：
+```
+if(!Object.is) {
+    Object.is = function(v1, v2) {
+        //判断是否是-0
+        if(v1===0 && v2===0){
+            return 1/v1 === 1/v2;
+        }
+        //判断是否是NaN
+        if(v1 !== v1) {
+            return v2 !== v2;
+        }
+        return v1 === v2;
+    }
+}
+```
+注意，能使用==和===就不要使用Object.is(),因为前者效率更高，更为通用。Object.is主要用来处理那些特殊的相等比较。
