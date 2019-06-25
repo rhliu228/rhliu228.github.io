@@ -9,3 +9,5 @@
 3. 如果valueOf方法返回的是对象，则报错。
 
 对于普通对象来说，除非自行定义，否则toString()返回内部属性[[Class]]的值，例如"[object Object]","[object RegExp]"。数组的默认toString方法经过了重新定义，将所有单元格字符串化后用","串联起来。
+
+#### 1.2 ToNumber
