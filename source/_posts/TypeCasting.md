@@ -7,4 +7,5 @@
 1. 调用对象自身的toString方法，如果返回基本类型值，就直接对该值使用String函数，不再进行后续步骤。
 2. 如果toString方法返回的是对象，再调用原对象的valueOf方法，如果valueOf方法返回原始类型的值，则对该值使用String函数，不再进行后续步骤。
 3. 如果valueOf方法返回的是对象，则报错。
+
 对于普通对象来说，除非自行定义，否则toString()返回内部属性[[Class]]的值，例如"[object Object]","[object RegExp]"。数组的默认toString方法经过了重新定义，将所有但愿如此字符串化后用","串联起来。
