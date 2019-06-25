@@ -24,3 +24,16 @@ Number([1]);  //1
 Number([1,2]);  //NaN
 Number(['abc']); //NaN
 ```
+#### 1.3 ToBoolean
+Javasccript中的值可以分为两类：
+* 可以被强制转换为false的值
+* 其他（被强制转换为true）的值
+
+以下是假值： 
+* undefined
+* null
+* false
+* +0, -0, NaN
+* ""
+
+除此之外，浏览器在某些特定情况下，在常规Javascript语法基础上自己创建了一些外来值，这些就是假值对象。假值对象看起来和普通对象差不多，但将它们强制转换为布尔值时结果为false。例如IE浏览器在新版本中为了摆脱对旧版本对象document.all的支持，将其设置为假值对象。
