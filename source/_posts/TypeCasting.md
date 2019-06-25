@@ -93,8 +93,11 @@ var y = '42';
 x == y;  // false
 ```
 Type(y)是布尔值，首先将其转换为数字1，变成1 == '42',二者类型不等，'42'根据1.5.2规则被转换为42，变成1==42，结果为false。由此可以看出，字符串'42'既不等于true也不等于false。
-##### 1.5.3 null和undefined的相等比较
+##### 1.5.4 null和undefined的相等比较
 *  如果x为null，y为undefined，返回true。
 *  如果x为undefined，y为null，返回true。
 
 除此之外其他值都不会和它们两个相等
+##### 1.5.4 对象和非对象的相等比较
+*  如果Type(x)是数字或字符串，Type(y)是对象，则返回x === ToPrimitive(y)的结果。
+*  如果Type(x)是对象，Type(y)是数字或字符串，则返回ToPrimitive(x) === y的结果。
