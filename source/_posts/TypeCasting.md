@@ -11,3 +11,16 @@
 对于普通对象来说，除非自行定义，否则toString()返回内部属性[[Class]]的值，例如"[object Object]","[object RegExp]"。数组的默认toString方法经过了重新定义，将所有单元格字符串化后用","串联起来。
 
 #### 1.2 ToNumber
+将基本类型转换为数字的规则是： true转化为1，false为0。undefined转化为NaN，null转化为0。ToNumber对字符串的处理遵循数字常量的相关规则和语法。对象（包括数组）会首先被转换为相应的基本类型值，如果返回的是非数字的基本类型，再遵循以上规则将其强制转换为数字。为了将值转换为基本类型值：
+1. 抽象操作ToPrmitive会首先检查该值是否有valueOf()方法，如果有并且返回基本类型值，就使用该返回值进行强制类型转换。
+2. 如果没有就继续使用toString()方法返回的基本类型值进行强制类型转换。
+3. 如果valueOf和toString方法均不返回基本类型值，则产生TypeError错误。
+
+例子： 
+```
+Number([]);  //0
+Number("");  //0
+Number([1]);  //1
+Number([1,2]);  //NaN
+Number(['abc']); //NaN
+```
