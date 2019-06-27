@@ -32,7 +32,7 @@
 ```
 想要支持module和nomodule的核心就是 Babel7的插件预设babel-preset-env。babel-preset-env将基于实际浏览器以及运行环境，自动确定babel插件以及polyfill，转义ES2015以及此版本以上的语法。而该preset的esmodules属性可以让我们直接编译到 ES2015+ 的语法。
 改造一下webpack，构建两次，分别用不同的 babel 配置，就可以编译出两份文件。
-翻看@vue-cli-service模块的源码， 我在里面找到了CLI为了实现这个功能的webpack插件：ModernModePlugin：
+翻看@vue-cli-service模块的源码， 我在里面找到了CLI为了实现这个功能的webpack插件：ModernModePlugin。该插件暴露了一个es6类，在该类的prototype属性上有一个apply方法定义如下：
 ```
   apply (compiler) {
     if (!this.isModernBuild) {
