@@ -32,7 +32,59 @@
 ```
 想要支持module和nomodule的核心就是 Babel7的插件预设babel-preset-env。babel-preset-env将基于实际浏览器以及运行环境，自动确定babel插件以及polyfill，转义ES2015以及此版本以上的语法。而该preset的esmodules属性可以让我们直接编译到 ES2015+ 的语法。
 改造一下webpack，构建两次，分别用不同的 babel 配置，就可以编译出两份文件。
-翻看@vue-cli-service模块的源码， 我在里面找到了CLI为了实现这个功能的webpack插件：ModernModePlugin。该插件暴露了一个es6类，在该类的prototype属性上的apply方法定义如下：
+CLI引入了@vue/babel-preset-app插件来提供babel-preset-env的功能，插件支持用户构建应用程序、UMD或原生web组件，其配置如下：
+```
+// @vue/babel-preset-app/index.js
+// resolve targets
+  let targets
+  if (process.env.VUE_CLI_BABEL_TARGET_NODE) {
+    // running tests in Node.js
+    targets = { node: 'current' }
+  } else if (process.env.VUE_CLI_BUILD_TARGET === 'wc' || process.env.VUE_CLI_BUILD_TARGET === 'wc-async') {
+    // targeting browsers that at least support ES2015 classes
+    // https://github.com/babel/babel/blob/master/packages/babel-preset-env/data/plugins.json#L52-L61
+    targets = {
+      browsers: [
+        'Chrome >= 49',
+        'Firefox >= 45',
+        'Safari >= 10',
+        'Edge >= 13',
+        'iOS >= 10',
+        'Electron >= 0.36'
+      ]
+    }
+  } else if (process.env.VUE_CLI_MODERN_BUILD) {
+    // targeting browsers that support <script type="module">
+    targets = { esmodules: true }
+  } else {
+    targets = rawTargets
+  }
+
+  // included-by-default polyfills. These are common polyfills that 3rd party
+  // dependencies may rely on (e.g. Vuex relies on Promise), but since with
+  // useBuiltIns: 'usage' we won't be running Babel on these deps, they need to
+  // be force-included.
+  let polyfills
+  const buildTarget = process.env.VUE_CLI_BUILD_TARGET || 'app'
+  if (
+    buildTarget === 'app' &&
+    useBuiltIns === 'usage' &&
+    !process.env.VUE_CLI_BABEL_TARGET_NODE &&
+    !process.env.VUE_CLI_MODERN_BUILD
+  ) {
+    polyfills = getPolyfills(targets, userPolyfills || defaultPolyfills, {
+      ignoreBrowserslistConfig,
+      configPath
+    })
+    plugins.push([
+      require('./polyfillsPlugin'),
+      { polyfills, entryFiles, useAbsolutePath: !!absoluteRuntime }
+    ])
+  } else {
+    polyfills = []
+  }
+```
+翻看@vue/cli-service模块的源码， 我在里面找到CLI为了支持处理模板中的 module 和 nomodule 属性而引入的webpack插件：ModernModePlugin。该插件暴露了一个es6类，在该类的prototype属性上的apply方法定义如下：
 ```
   apply (compiler) {
     if (!this.isModernBuild) {
@@ -42,7 +94,7 @@
     }
   }
 ```
-isModernBuild属性表示当前构建是否应该编译到 ES2015+ 的语法。若是为false，则调用applyLegacy方法，并把编译器对象作为参数传递过去：
+isModernBuild属性表示当前构建是否生成ES2015+版本的代码。若是为false，则调用applyLegacy方法，并把编译器对象作为参数传递过去：
 ```
 applyLegacy (compiler) {
   const ID = `vue-cli-legacy-bundle`
@@ -153,3 +205,5 @@ ios10.3版本有个bug，不支持 nomodule 属性，这样带来的后果就是
 ```
 
 这段代码被ModernModePlugin引入并定义在常量safariFix中。
+参考链接：
+* [Webpack 构建策略 module 和 nomodule](https://github.com/shaodahong/dahong/issues/18)
