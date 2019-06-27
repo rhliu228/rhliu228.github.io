@@ -16,20 +16,30 @@
 在开发阶段，CLI工具会充分利用webpack4在development模式下内置的调试工具以及热更新、热替换等进行构建优化。而翻看npm run build后的代码，发现打包后的代码跟我自己之前手动配置的差别很大。于是我开始查阅相关资料，了解Vue CLI3背后的配置以及其原理。
 
 观察打包后的js文件，首先会发现每个chunk都会有两个副本，其中一个副本在文件名后面添加了legacy后缀名，另一个则没有。而在html文件中，给引入带有legacy后缀js文件的script标签添加了nomodule属性，另一个script标签则添加了type=module属性。
-通过查阅type=module属性的作用可以了解到，在当下，对于大部分用户而言，我们根本不需要把代码编译到 ES5，不仅体积大，而且运行速度慢。我们需要做的，就是把代码编译到 ES2015+，然后为少数使用老旧浏览器的用户保留一个 ES5 标准的备胎即可。其核心原理在于依赖 <script type="module">的支持来分辨浏览器对 ES2015+ 代码的支持，并且可以用<script nomodule>进行优雅降级（get到新技能的欢喜^^）
+通过查阅type=module属性的作用可以了解到，在当下，对于大部分用户而言，我们根本不需要把代码编译到 ES5，不仅体积大，而且运行速度慢。我们需要做的，就是把代码编译到 ES2015+，然后为少数使用老旧浏览器的用户保留一个 ES5 标准的备胎即可。其核心原理在于依赖 <script type="module">的支持来分辨浏览器对 ES2015+ 代码的支持，并且可以用<script nomodule>进行优雅降级。
 支持 <script type="module"> 的浏览器，必然支持下面的特性：
 * async/await
 * Promise
 * Class
 * 箭头函数、Map/Set、fetch 等等...
   
-而不支持 <script type="module"> 的老旧浏览器，会因为无法识别这个标签，而不去加载 ES2015+ 的代码。另外老旧的浏览器同样无法识别 nomodule 属性，会自动忽略它，从而加载 ES5 标准的代码。
+而不支持 <script type="module"> 的老旧浏览器，会因为无法识别这个标签，而不去加载 ES2015+ 的代码。另外老旧的浏览器同样无法识别nomodule 属性，会自动忽略它，从而加载 ES5 标准的代码。
 
 ```
 <script type="module" src="app.js"></script>
 
 <script nomodule src="app-legacy.js"></script>   // legacy 是遗产的意思，在这里面是老旧的意思，理解成老旧的语法
 ```
-想要支持 module 和 nomodule 核心就是 Babel7的插件预设babel-preset-env。babel-preset-env将基于实际浏览器以及运行环境，自动确定babel插件以及polyfill，转义ES2015以及此版本以上的语法。而该preset的esmodules属性可以让我们直接编译到 ES2015+ 的语法。
+想要支持module和nomodule的核心就是 Babel7的插件预设babel-preset-env。babel-preset-env将基于实际浏览器以及运行环境，自动确定babel插件以及polyfill，转义ES2015以及此版本以上的语法。而该preset的esmodules属性可以让我们直接编译到 ES2015+ 的语法。
 改造一下webpack，构建两次，分别用不同的 babel 配置，就可以编译出两份文件。
+翻看@vue-cli-service模块的源码， 我在里面找到了CLI为了实现这个功能的webpack插件：ModernModePlugin：
+```
+  apply (compiler) {
+    if (!this.isModernBuild) {
+      this.applyLegacy(compiler)
+    } else {
+      this.applyModern(compiler)
+    }
+  }
+```
 
