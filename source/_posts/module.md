@@ -44,20 +44,112 @@
 ```
 isModernBuild属性表示当前构建是否应该编译到 ES2015+ 的语法。若是为false，则调用applyLegacy方法，并把编译器对象作为参数传递过去：
 ```
- applyLegacy (compiler) {
-    const ID = `vue-cli-legacy-bundle`
-    compiler.hooks.compilation.tap(ID, compilation => {
-      compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync(ID, async (data, cb) => {
-        // get stats, write to disk
-        await fs.ensureDir(this.targetDir)
-        const htmlName = path.basename(data.plugin.options.filename)
-        // Watch out for output files in sub directories
-        const htmlPath = path.dirname(data.plugin.options.filename)
-        const tempFilename = path.join(this.targetDir, htmlPath, `legacy-assets-${htmlName}.json`)
-        await fs.mkdirp(path.dirname(tempFilename))
-        await fs.writeFile(tempFilename, JSON.stringify(data.body))
-        cb()
-      })
+applyLegacy (compiler) {
+  const ID = `vue-cli-legacy-bundle`
+  compiler.hooks.compilation.tap(ID, compilation => {
+    compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync(ID, async (data, cb) => {
+      // get stats, write to disk
+      await fs.ensureDir(this.targetDir)
+      const htmlName = path.basename(data.plugin.options.filename)
+      // Watch out for output files in sub directories
+      const htmlPath = path.dirname(data.plugin.options.filename)
+      const tempFilename = path.join(this.targetDir, htmlPath, `legacy-assets-${htmlName}.json`)
+      await fs.mkdirp(path.dirname(tempFilename))
+      await fs.writeFile(tempFilename, JSON.stringify(data.body))
+      cb()
+    })
+  })
+}
+```
+
+若为false，则调用applyModern方法：
+```
+  // use <script type="module"> for modern assets
+  data.body.forEach(tag => {
+    if (tag.tagName === 'script' && tag.attributes) {
+      tag.attributes.type = 'module'
+    }
+  })
+
+  // use <link rel="modulepreload"> instead of <link rel="preload">
+  // for modern assets
+  data.head.forEach(tag => {
+    if (tag.tagName === 'link' &&
+        tag.attributes.rel === 'preload' &&
+        tag.attributes.as === 'script') {
+      tag.attributes.rel = 'modulepreload'
+    }
+  })
+
+  // inject links for legacy assets as <script nomodule>
+  const htmlName = path.basename(data.plugin.options.filename)
+  // Watch out for output files in sub directories
+  const htmlPath = path.dirname(data.plugin.options.filename)
+  const tempFilename = path.join(this.targetDir, htmlPath, `legacy-assets-${htmlName}.json`)
+  const legacyAssets = JSON.parse(await fs.readFile(tempFilename, 'utf-8'))
+    .filter(a => a.tagName === 'script' && a.attributes)
+  legacyAssets.forEach(a => { a.attributes.nomodule = '' })
+
+  if (this.unsafeInline) {
+    // inject inline Safari 10 nomodule fix
+    data.body.push({
+      tagName: 'script',
+      closeTag: true,
+      innerHTML: safariFix
+    })
+  } else {
+    // inject the fix as an external script
+    const safariFixPath = path.join(this.jsDirectory, 'safari-nomodule-fix.js')
+    const fullSafariFixPath = path.join(compilation.options.output.publicPath, safariFixPath)
+    compilation.assets[safariFixPath] = {
+      source: function () {
+        return new Buffer(safariFix)
+      },
+      size: function () {
+        return Buffer.byteLength(safariFix)
+      }
+    }
+    data.body.push({
+      tagName: 'script',
+      closeTag: true,
+      attributes: {
+        src: fullSafariFixPath
+      }
     })
   }
+
+  data.body.push(...legacyAssets)
+  await fs.remove(tempFilename)
+  cb()
+  // 在 htmlWebpackPlugin 处理好模板的时候再处理下，把页面上 <script nomudule=""> 处理成 <script nomudule>
+  compilation.hooks.htmlWebpackPluginAfterHtmlProcessing.tap(ID, data => {
+    data.html = data.html.replace(/\snomodule="">/g, ' nomodule>')
+  })
 ```
+
+ios10.3版本有个bug，不支持 nomodule 属性，这样带来的后果就是 10.3 版本的 IOS 同时执行两份 JS 文件。有个hack写法可以解决这个问题：
+```
+// 这个会解决 10.3 版本同时加载 nomodule 脚本的 bug，但是仅限于外部脚本，对于内联的是没用的
+// fix 的核心就是利用 document 的 beforeload 事件来阻止 nomodule 标签的脚本加载
+(function() {
+  var check = document.createElement('script');
+  if (!('noModule' in check) && 'onbeforeload' in check) {
+    var support = false;
+    document.addEventListener('beforeload', function(e) {
+      if (e.target === check) {
+        support = true;
+      } else if (!e.target.hasAttribute('nomodule') || !support) {
+        return;
+      }
+      e.preventDefault();
+    }, true);
+
+    check.type = 'module';
+    check.src = '.';
+    document.head.appendChild(check);
+    check.remove();
+  }
+}());
+```
+
+这段代码被ModernModePlugin引入并定义在常量safariFix中。
