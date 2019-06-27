@@ -207,3 +207,4 @@ ios10.3版本有个bug，不支持 nomodule 属性，这样带来的后果就是
 这段代码被ModernModePlugin引入并定义在常量safariFix中。
 参考链接：
 * [Webpack 构建策略 module 和 nomodule](https://github.com/shaodahong/dahong/issues/18)
+* [React 16 加载性能优化指南](https://zhuanlan.zhihu.com/p/37148975)
