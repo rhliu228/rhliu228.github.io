@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   
-  <title>Zoe的博客</title>
+  <title>JS的强制类型转换 | Zoe的博客</title>
   
   
 
@@ -223,7 +223,7 @@
   
     <h1 class="title">
       <a href="/TypeCasting/">
-        2019-06-29
+        JS的强制类型转换
       </a>
     </h1>
   
@@ -252,7 +252,7 @@
             <div class="new-meta-item date">
   <a class="notlink">
     <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-    <p>2019-06-29</p>
+    <p>2019-06-28</p>
   </a>
 </div>
 
@@ -296,7 +296,7 @@
 
       <section class="article typo">
         <div class="article-entry" itemprop="articleBody">
-          <p>将值从一种类型转换为另一种类型叫做类型转换（type casting），这是显示的情况；隐式的情况称为强制类型转换（coercion）。也可以说，类型转换发生在静态类型语言的编辑阶段，强制类型转换发生在动态类型语言的运行时。<br><strong>JS的强制类型转换只会返回基本类型值，不会返回对象和函数</strong>。可以从转换操作是否明显来划分显示强制类型转换和隐式强制类型转换。</p>
+          <p>本文是我在看了《你不知道的Javascript（中卷）》后对Javascript的强制类型转换的归纳和总结。看完书中的第一部分后，对强制类型转换和宽松相等、严格相等有了更透彻的理解。<br><a id="more"></a><br>将值从一种类型转换为另一种类型叫做类型转换（type casting），这是显示的情况；隐式的情况称为强制类型转换（coercion）。也可以说，类型转换发生在静态类型语言的编辑阶段，强制类型转换发生在动态类型语言的运行时。<br><strong>JS的强制类型转换只会返回基本类型值，不会返回对象和函数</strong>。可以从转换操作是否明显来划分显示强制类型转换和隐式强制类型转换。</p>
 <h4 id="1-1-ToString"><a href="#1-1-ToString" class="headerlink" title="1.1 ToString"></a>1.1 ToString</h4><p>基本类型的字符串化规则为： null转化为”null”，undefined转化为”undefined”，true转化为”true”，false转化为”false”，数字的字符串化采用通用规则，不过极小和极大的数字使用指数形式。</p>
 <p>对于对象来说，字符串化的背后规则是： </p>
 <ol>
@@ -312,7 +312,7 @@
 <li>如果valueOf和toString方法均不返回基本类型值，则产生TypeError错误。</li>
 </ol>
 <p>例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Number([]);  //0</span><br><span class="line">Number(&quot;&quot;);  //0</span><br><span class="line">Number([1]);  //1</span><br><span class="line">Number([1,2]);  //NaN</span><br><span class="line">Number([&apos;abc&apos;]); //NaN</span><br></pre></td></tr></table></figure></p>
-<h4 id="1-3-ToBoolean"><a href="#1-3-ToBoolean" class="headerlink" title="1.3 ToBoolean"></a>1.3 ToBoolean</h4><p>Javasccript中的值可以分为两类：</p>
+<h4 id="1-3-ToBoolean"><a href="#1-3-ToBoolean" class="headerlink" title="1.3 ToBoolean"></a>1.3 ToBoolean</h4><p>Javascript中的值可以分为两类：</p>
 <ul>
 <li>可以被强制转换为false的值</li>
 <li>其他（被强制转换为true）的值</li>
@@ -363,9 +363,9 @@
 <p>除此之外其他值都不会和它们两个相等</p>
 <h5 id="1-5-4-对象和非对象的相等比较"><a href="#1-5-4-对象和非对象的相等比较" class="headerlink" title="1.5.4 对象和非对象的相等比较"></a>1.5.4 对象和非对象的相等比较</h5><ul>
 <li>如果Type(x)是数字或字符串，Type(y)是对象，则返回x === ToPrimitive(y)的结果。</li>
-<li>如果Type(x)是对象，Type(y)是数字或字符串，则返回ToPrimitive(x) === y的结果。<h5 id="1-5-5假值比较"><a href="#1-5-5假值比较" class="headerlink" title="1.5.5假值比较"></a>1.5.5假值比较</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&quot;0&quot; == false // true</span><br><span class="line">false == 0    // true</span><br><span class="line">false == []   // true</span><br><span class="line">false == &#123;&#125; // false</span><br><span class="line">&quot;&quot; == 0      // true</span><br><span class="line">&quot;&quot; == []    //true</span><br><span class="line">0 == []     // true</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-</li>
+<li>如果Type(x)是对象，Type(y)是数字或字符串，则返回ToPrimitive(x) === y的结果。</li>
 </ul>
+<h5 id="1-5-5假值比较"><a href="#1-5-5假值比较" class="headerlink" title="1.5.5假值比较"></a>1.5.5假值比较</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&quot;0&quot; == false // true</span><br><span class="line">false == 0    // true</span><br><span class="line">false == []   // true</span><br><span class="line">false == &#123;&#125; // false</span><br><span class="line">&quot;&quot; == 0      // true</span><br><span class="line">&quot;&quot; == []    //true</span><br><span class="line">0 == []     // true</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 <p>还有一种极端的情况<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[] == ![]  // true</span><br></pre></td></tr></table></figure></p>
 <p>上述表达式会首先进行布尔值的强制类型转换，所以[] == ![]变成了[] == false,由于[] == false，所以结果为true</p>
 <h5 id="1-5-6总结"><a href="#1-5-6总结" class="headerlink" title="1.5.6总结"></a>1.5.6总结</h5><ul>
@@ -383,10 +383,10 @@
     <div class="new-meta-box">
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-06-29T14:31:50+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-07-22T21:19:54+08:00">
   <a class="notlink">
     <i class="fas fa-clock" aria-hidden="true"></i>
-    <p>last updated at Jun 29, 2019</p>
+    <p>last updated at Jul 22, 2019</p>
   </a>
 </div>
 
@@ -394,6 +394,9 @@
       
         
           
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Javascript/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Javascript</p></a></div>
+
 
         
       
@@ -403,7 +406,7 @@
   <div class="-mob-share-list share-body">
     
       
-        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer" href="http://connect.qq.com/widget/shareqq/index.html?url=https://rhliu228.github.io./TypeCasting/&title= | Zoe的博客&summary=">
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer" href="http://connect.qq.com/widget/shareqq/index.html?url=https://rhliu228.github.io./TypeCasting/&title=JS的强制类型转换 | Zoe的博客&summary=本文是我在看了《你不知道的Javascript（中卷）》后对Javascript的强制类型转换的归纳和总结。看完书中的第一部分后，对强制类型转换和宽松相等、严格相等有了更透彻的理解。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
           
@@ -411,7 +414,7 @@
       
     
       
-        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://rhliu228.github.io./TypeCasting/&title= | Zoe的博客&summary=">
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://rhliu228.github.io./TypeCasting/&title=JS的强制类型转换 | Zoe的博客&summary=本文是我在看了《你不知道的Javascript（中卷）》后对Javascript的强制类型转换的归纳和总结。看完书中的第一部分后，对强制类型转换和宽松相等、严格相等有了更透彻的理解。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
           
@@ -419,7 +422,7 @@
       
     
       
-        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer" href="http://service.weibo.com/share/share.php?url=https://rhliu228.github.io./TypeCasting/&title= | Zoe的博客&summary=">
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer" href="http://service.weibo.com/share/share.php?url=https://rhliu228.github.io./TypeCasting/&title=JS的强制类型转换 | Zoe的博客&summary=本文是我在看了《你不知道的Javascript（中卷）》后对Javascript的强制类型转换的归纳和总结。看完书中的第一部分后，对强制类型转换和宽松相等、严格相等有了更透彻的理解。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
           
@@ -441,20 +444,6 @@
         
             <div class="prev-next">
                 
-                    <section class="prev">
-                        <span class="art-item-left">
-                            <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;Previous</h6>
-                            <h4>
-                                <a href="/module/" rel="prev" title>
-                                  
-                                      2019-06-29
-                                  
-                                </a>
-                            </h4>
-                            
-                        </span>
-                    </section>
-                
                 
                     <section class="next">
                         <span class="art-item-right" aria-hidden="true">
@@ -466,6 +455,11 @@
                                     
                                 </a>
                             </h4>
+                            
+                                
+                                <h6 class="tags">
+                                    <a class="tag" href="/blog/tags/Javascript/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>Javascript</a>
+                                </h6>
                             
                         </span>
                     </section>
@@ -495,7 +489,7 @@
 
   <script>
     window.subData = {
-      title: '',
+      title: 'JS的强制类型转换',
       tools: true
     }
   </script>
@@ -644,7 +638,7 @@
 </header>
 
     <div class="content pure">
-      <a href="/blog/tags/Character-Encoding/" style="font-size: 14px; color: #999">Character Encoding</a> <a href="/blog/tags/函数式编程/" style="font-size: 14px; color: #999">函数式编程</a> <a href="/blog/tags/响应式/" style="font-size: 14px; color: #999">响应式</a>
+      <a href="/blog/tags/Javascript/" style="font-size: 24px; color: #555">Javascript</a> <a href="/blog/tags/babel/" style="font-size: 14px; color: #999">babel</a> <a href="/blog/tags/vue-cli3/" style="font-size: 14px; color: #999">vue-cli3</a> <a href="/blog/tags/webpack/" style="font-size: 14px; color: #999">webpack</a> <a href="/blog/tags/函数式编程/" style="font-size: 14px; color: #999">函数式编程</a> <a href="/blog/tags/响应式/" style="font-size: 14px; color: #999">响应式</a> <a href="/blog/tags/字符编码/" style="font-size: 14px; color: #999">字符编码</a>
     </div>
   </section>
 
