@@ -1,6 +1,8 @@
 ---
 title: JS的类型和特殊值
 date: 2019-06-22 09:01:00
+tags: 
+- Javascript
 ---
 大多数开发者认为，像Javascript这样的动态语言是没有类型的，但是事实上，ECMAScript语言中所有的值都有一个对应的语言类型，ECMAScript语言类型包括：Undefined、null、Boolean、String、Object、Number、symbol。
 Javascript中的变量是没有类型的，只有值才有。变量可以随时持有任何类型的值。

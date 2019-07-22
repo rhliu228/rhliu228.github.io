@@ -2,7 +2,7 @@
 title: 字符编码归纳
 date: 2019-06-16 20:57:35
 tags:
-- Character Encoding
+- 字符编码
 ---
 这篇文章主要是对ASCII，UTF-8，Unicode，GBK编码等概念进行阐述并加以区别。
 <!-- more -->
