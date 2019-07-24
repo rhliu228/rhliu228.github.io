@@ -53,3 +53,126 @@ const bubbleSort = arr => {
     return arr;
 }
 ```
+
+#### 3. 选择排序
+选择排序的第i次是选择第i小的记录，并把它放到第i小的位置上。换句话说，选择排序首先在未排序的序列中找到最小关键值，接着找到次小关键码值，以此类推。选择排序的独特之处在于交换操作很少。
+```
+const selectionSort = arr => {
+    for(let i = 0; i < arr.length -1; i++) {
+        let lowIndex = i;
+        for(let j = arr.length - 1; j > i; j--) {
+            if(arr[j] < arr[lowIndex]) {
+                lowIndex = j;
+            }
+        }
+        [arr[i], arr[lowIndex]] = [arr[lowIndex], arr[i]]
+    }
+    return arr;
+}
+```
+以上三种算法都比较慢，关键瓶颈在于只比较相邻元素，因此，比较和移动只能一步步进行（除选择排序外）。有时也称这三种排序为**交换排序**。
+
+#### 4. 希尔排序
+shell排序也叫缩小增量排序，核心思想就是分组,其试图将待排序序列变成基本有序的，再利用插入排序来完成最后的排序工作。
+```
+const shellSort = arr => {
+    var len = arr.length, gap = 1, temp;
+    while (gap<len/3) {
+        gap = gap*3 + 1;
+    }
+    for(gap; gap > 0 ; gap = Math.floor(gap/3)) {
+        for(let i = gap; i< len; i++) {
+            temp = arr[i];
+            let j;
+            for(j = i; j >= gap && arr[j-gap] > temp; j-=gap) {
+                arr[j] = arr[j-gap];
+            }
+            arr[j] = temp;
+        }
+    }
+    return arr;
+}
+```
+#### 5. 快速排序
+快速排序采用的是**分治法**策略：
+1. 首先选择一个轴值（pivot）（在概念上这与BST的根节点值类似）。
+2. 把比轴值小的结点（假设数目为k）放到数组左边的k个位置上，而大于轴值的节点被放在数组右边的n-k-1个位置上，这称为数组的一个划分。轴值的最终位置就是下标k。
+3. 再对左右子数组重复以上操作
+
+```
+const quickSort = arr => {
+    if(arr.length <= 1) {
+        return arr;
+    }
+    const pivotIndex = Math.floor(arr.length/2);
+    const pivot = arr.splice(pivotIndex, 1)[0];
+    let left = [];
+    let right = [];
+    for(let item of arr) {
+        item > pivot ? right.push(item) : left.push(item);
+    }
+    return quickSort(left).concat([pivot], quickSort(right));
+}
+```
+#### 6. 归并排序
+归并排序采用分治策略，体现在把待排序的列表分成片段，先处理各个片段，再通过某种方式把片段重组：
+1. 申请空间，用来存放合并后的序列
+2. 设置两个指针，最初位置分别为两个已经排序序列的起始位置
+3. 比较两个指针所指向的元素，选择相对小的元素放入合并空间，并移动指针到下一位置
+4. 重复步骤三直至某一指针到达序列尾
+5. 将另一未完序列的剩下元素直接复制到合并序列尾
+
+```
+const merge = (left, right) => {
+    let result = [];
+    while(left.length && right.length) {
+        left[0] < right[0] ? result.push(left.shift()) : result.push(right.shift());
+    }
+    return result.concat(left, right);
+}
+const mergeSort = arr => {
+    if(arr.length <= 1) {
+        return arr;
+    }
+    const middle = Math.floor(arr.length/2);
+    const left = arr.slice(0, middle);
+    const right = arr.slice(middle);
+    return merge(mergeSort(left), mergeSort(right));
+}
+```
+
+#### 6. 堆排序
+堆排序是指利用二叉堆这种数据结构所设计的排序算法。堆由两条性质来定义： 首先，它是一棵**完全二叉树**，所以能够用数组来表示和实现；其次，堆中存储的数据是局部有序的。对于最大堆来说，任意一个节点存储的值都大于或者等于其任意子节点存储的值，所以根节点存储着该树所有节点的最大值。最小堆的定义类似。但是无论是最大堆还是最小堆，任意节点与其兄弟节点都没有必然关系。堆排序的算法步骤如下：
+1. 把无序数列构建成二叉堆
+2. 循环摘取堆顶元素，替换到二叉堆的末尾，调整产生新的堆顶
+3. 直至堆为空
+```
+const adjustHeap = (arr, pos, length) => {
+    let temp = arr[pos];
+    let child = pos*2 + 1;
+    while(child < length) {
+        if(child+1<length && arr[child] < arr[child+1]){
+            child++;
+        }
+        if(arr[child]>temp) {
+            arr[pos] = arr[child];
+            pos = child;
+            child = 2*child+1;
+        }else {
+            break;
+        }
+
+    }
+    arr[pos] = temp;
+}
+const heapSort = arr => {
+    for(let i = Math.floor(arr.length/2); i > =0; i--) {
+        adjustHeap(arr, i, arr.length);
+    }
+    for(let i = arr.length - 1; i > 0; i--) {
+        [arr[i], arr[0]] = [arr[0], arr[i]];
+        adjustHeap(arr, 0, i);
+    }
+    return arr;
+}
+```
