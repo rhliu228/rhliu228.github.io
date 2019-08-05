@@ -15,6 +15,7 @@ tags:
 * Chrome Performance工具
 * 解决性能问题
 * 其他工具
+
 ## 一. Chrome Performance
 平时我们使用chrome开发者工具，用的比较多的工具是Element、Source、Network等，而今天的主角Performance的关注点是运行时性能表现（runtime performance）。
 Performance面板主要包括四个部分：
@@ -55,6 +56,7 @@ Figure3: 加载性能
 模拟移动端的CPU架构，默认情况下为No throttling
 * Enable advanced paint instrumentation
 启用该选项后可以查看浏览器的视图层和详细绘制信息
+
 ### 1.2 Overview
 ![Overview](/assets/img/performance/pic4.png)
 Figure4: Overview
