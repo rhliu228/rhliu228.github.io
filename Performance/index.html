@@ -276,7 +276,10 @@
 <ul>
 <li>Chrome Performance工具</li>
 <li>解决性能问题</li>
-<li>其他工具<h2 id="一-Chrome-Performance"><a href="#一-Chrome-Performance" class="headerlink" title="一. Chrome Performance"></a>一. Chrome Performance</h2>平时我们使用chrome开发者工具，用的比较多的工具是Element、Source、Network等，而今天的主角Performance的关注点是运行时性能表现（runtime performance）。<br>Performance面板主要包括四个部分：</li>
+<li>其他工具</li>
+</ul>
+<h2 id="一-Chrome-Performance"><a href="#一-Chrome-Performance" class="headerlink" title="一. Chrome Performance"></a>一. Chrome Performance</h2><p>平时我们使用chrome开发者工具，用的比较多的工具是Element、Source、Network等，而今天的主角Performance的关注点是运行时性能表现（runtime performance）。<br>Performance面板主要包括四个部分：</p>
+<ul>
 <li>Controls: 开始记录，停止记录和配置记录期间捕获的信息</li>
 <li>Overview: 页面性能概览</li>
 <li>Main Section主体: 可以查看火焰图，Network活动</li>
@@ -295,14 +298,17 @@
 <li>Disable Javascript Samples<br>默认情况下，火焰图(见下方)会显示JS函数调用的所有堆栈细节，可以通过启用该选项来禁止这一默认行为。启用选项后，火焰图只会显示JS顶部函数的调用堆栈</li>
 <li>Throttle the network while recording<br>模拟移动端的网络状态，默认情况下为No throttling</li>
 <li>Throttle the CPU while recording<br>模拟移动端的CPU架构，默认情况下为No throttling</li>
-<li>Enable advanced paint instrumentation<br>启用该选项后可以查看浏览器的视图层和详细绘制信息<h3 id="1-2-Overview"><a href="#1-2-Overview" class="headerlink" title="1.2 Overview"></a>1.2 Overview</h3><img src="/assets/img/performance/pic4.png" alt="Overview"><br>Figure4: Overview<h4 id="1-2-1-FPS（刷新率）"><a href="#1-2-1-FPS（刷新率）" class="headerlink" title="1.2.1 FPS（刷新率）"></a>1.2.1 FPS（刷新率）</h4>表示一秒之间能够完成多少次重新渲染网页，一次重新渲染代表一帧（frame）。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。每秒低于24帧的动画，人眼就能感受到停顿；而如果能达到每秒70帧甚至80帧，就会极其流畅。大多数显示器的刷新频率是<strong>60Hz</strong>，为了与系统一致，以及节省电力，浏览器会自动按照这个频率，与显示器同步刷新（如果可以做到的话），达到最佳的视觉效果。根据公式<strong>T=1/f</strong>，可以得知，每次重新渲染的时间间隔不能超过16.66毫秒，也就是说JavaScript每个任务的耗时，必须少于<strong>16毫秒</strong>。下图的绿色竖线越高，FPS 越高。 FPS 图表上的<strong>红色块</strong>表示FPS很低，很可能存在性能问题。<h4 id="1-2-2-CPU"><a href="#1-2-2-CPU" class="headerlink" title="1.2.2 CPU"></a>1.2.2 CPU</h4>此面积图指示消耗CPU资源的事件类型：<ol>
+<li>Enable advanced paint instrumentation<br>启用该选项后可以查看浏览器的视图层和详细绘制信息</li>
+</ul>
+<h3 id="1-2-Overview"><a href="#1-2-Overview" class="headerlink" title="1.2 Overview"></a>1.2 Overview</h3><p><img src="/assets/img/performance/pic4.png" alt="Overview"><br>Figure4: Overview</p>
+<h4 id="1-2-1-FPS（刷新率）"><a href="#1-2-1-FPS（刷新率）" class="headerlink" title="1.2.1 FPS（刷新率）"></a>1.2.1 FPS（刷新率）</h4><p>表示一秒之间能够完成多少次重新渲染网页，一次重新渲染代表一帧（frame）。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。每秒低于24帧的动画，人眼就能感受到停顿；而如果能达到每秒70帧甚至80帧，就会极其流畅。大多数显示器的刷新频率是<strong>60Hz</strong>，为了与系统一致，以及节省电力，浏览器会自动按照这个频率，与显示器同步刷新（如果可以做到的话），达到最佳的视觉效果。根据公式<strong>T=1/f</strong>，可以得知，每次重新渲染的时间间隔不能超过16.66毫秒，也就是说JavaScript每个任务的耗时，必须少于<strong>16毫秒</strong>。下图的绿色竖线越高，FPS 越高。 FPS 图表上的<strong>红色块</strong>表示FPS很低，很可能存在性能问题。</p>
+<h4 id="1-2-2-CPU"><a href="#1-2-2-CPU" class="headerlink" title="1.2.2 CPU"></a>1.2.2 CPU</h4><p>此面积图指示消耗CPU资源的事件类型：</p>
+<ol>
 <li>蓝色：网络通信和HTML解析</li>
 <li>黄色：JavaScript执行</li>
 <li>紫色：样式计算和布局，即布局</li>
 <li>绿色：绘制</li>
 </ol>
-</li>
-</ul>
 <h4 id="1-2-3-NET"><a href="#1-2-3-NET" class="headerlink" title="1.2.3 NET"></a>1.2.3 NET</h4><p>每个蓝色横杆表示一次网络请求，横杆越长，代表该次请求花费时间越长。</p>
 <h4 id="1-2-4-HEAP"><a href="#1-2-4-HEAP" class="headerlink" title="1.2.4 HEAP"></a>1.2.4 HEAP</h4><p>内存图标视图，显示堆内存占用状态。随着内存使用量的增长，你会看到图表区域的时间线捕获也会增长。 当图表突然下降时，代表一次垃圾收集器（Garbage collector）运行时的实例，此时清理了引用的内存对象。</p>
 <h3 id="1-3-Main-Section"><a href="#1-3-Main-Section" class="headerlink" title="1.3 Main Section"></a>1.3 Main Section</h3><h4 id="1-3-1-Flame-Graph火焰图"><a href="#1-3-1-Flame-Graph火焰图" class="headerlink" title="1.3.1 Flame Graph火焰图"></a>1.3.1 Flame Graph火焰图</h4><p>火焰图最初用于展示linux系统CPU调用栈，其y轴表示调用栈，每一层都是一个函数；x 轴表示抽样数，如果一个函数在x轴占据的宽度越宽，就表示它被抽到的次数多，即执行的时间长。<br>浏览器的火焰图与标准火焰图有两点差异：</p>
@@ -493,7 +499,7 @@
     <div class="new-meta-box">
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-08-05T21:04:20+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-08-05T21:06:58+08:00">
   <a class="notlink">
     <i class="fas fa-clock" aria-hidden="true"></i>
     <p>last updated at Aug 5, 2019</p>
@@ -505,7 +511,7 @@
         
           
   
-  <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Performance/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Performance</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Javascript/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Javascript</p></a></div>
+  <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Javascript/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Javascript</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Performance/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Performance</p></a></div>
 
 
         
