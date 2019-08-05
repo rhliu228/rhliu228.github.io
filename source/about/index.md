@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 关于
+title: 好好学习，天天向上
 body: [article, grid, comments]
 valine:
   placeholder: 有什么想对我说的呢？

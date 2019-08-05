@@ -1,10 +1,11 @@
 ---
 title: 深入理解Javascript中的数字
-date: 2019-05-15 19:05:00
-type: projects
+date: 2019-04-02 19:05:00
+#type: projects
 tags: 
 - Javascript
 ---
+
 我们知道，在java中，数字会分为整型和浮点型，其中浮点型区分为单精度跟双精度格式。但是在JS中，只有Number型，并不区分整型跟浮点型，数字统一采用IEEE 754标准的64位双精格式进行存储。
 <!-- more -->
 #### 1. IEEE 754的双精度
