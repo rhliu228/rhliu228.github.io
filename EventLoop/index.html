@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   
-  <title>字符编码归纳 | Zoe的博客</title>
+  <title>比较Node和浏览器的Event Loop | Zoe的博客</title>
   
   
 
@@ -192,8 +192,8 @@
         
   
     <h1 class="title">
-      <a href="/CharacterEncoding/">
-        字符编码归纳
+      <a href="/EventLoop/">
+        比较Node和浏览器的Event Loop
       </a>
     </h1>
   
@@ -222,7 +222,7 @@
             <div class="new-meta-item date">
   <a class="notlink">
     <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-    <p>2019-05-16</p>
+    <p>2019-09-14</p>
   </a>
 </div>
 
@@ -266,76 +266,68 @@
 
       <section class="article typo">
         <div class="article-entry" itemprop="articleBody">
-          <p>这篇文章主要是对ASCII，UTF-8，Unicode，GBK编码等概念进行阐述并加以区别。<br><a id="more"></a><br>首先阐述三个跟字符相关的概念：</p>
+          <p>一直以为大致搞懂浏览器的eventLoop就差不多了，直到我看了《Node.js调试指南》后，才发现把浏览器和Node环境的eventLoop混在一起谈是不合适的。虽然它们的任务源确实存在很大区别，但更重要的是，Node下eventloop的“读取任务队列”划分为6个阶段，从而导致两者在优先级队列的执行次序上有很大不同。 这篇文章主要阐述浏览器和node环境的eventloop异同。<br><a id="more"></a><br>JavaScript是单线程运行，所以异步操作特别重要。为了管理异步回调， Javascript采取事件循环（Event Loop）的策略：</p>
 <ul>
-<li>字符表：要显示的字符的集合</li>
-<li>字符编码：字符表中的字符对应的二进制表示</li>
-<li>字符集：定义了一种规则，将一串二进制数字解释为一个字符</li>
+<li>所有任务都在主线程上运行，形成一个执行栈（Execution Context Stack）</li>
+<li>在主线程之外还存在一个或者多个“任务队列”（Task Queue），系统把异步任务放到“任务队列”中。</li>
+<li>一旦“执行栈”中的任务执行完毕，系统就会读取“任务队列”。某个异步任务结束等待状态，从“任务队列”进入执行栈，得以执行。</li>
+<li>主线程不断重复第三步。</li>
 </ul>
-<p>例如，unicode给世界上的字符赋予一个独一无二的二进制编码，这是字符集方案，但是却没有定义字符是如何传输和存储的，而utf-8则是基于unicode的一种编码方案实现。</p>
-<h4 id="1-ASCII"><a href="#1-ASCII" class="headerlink" title="1. ASCII"></a>1. ASCII</h4><p>ASCII是美国制定的字符编码，使用一个字节（8bit）存储字符，一共规定了128个字符的编码，最前面的一位统一规定为0。其中0-32号字符用于特殊用途的控制码，33-127号字符表示大小写字母和数字。<br>ASCII扩展字符集利用了字节前面的最高位，这样字符便扩展到255个，扩展的128-255字符主要用于横线、竖线、交叉等形状。</p>
-<h4 id="2-中文编码"><a href="#2-中文编码" class="headerlink" title="2. 中文编码"></a>2. 中文编码</h4><ul>
-<li><p>GB2312<br>GB2312是对ASCII的中文扩展，在这种情况下，原来 0 – 127 号字符代表的含义不变，这就是半角字符。但是两个大于127的字节连在一起时，就代表GB2312编码的字符。这两个字节的范围是：<br>第一个字节范围是[0xA1(161),0xF7(247)]，第二个字节的范围是[0xA1(161),0xFE(254)]<br>共收录了6763个汉字，还包括拉丁字母，希腊字母和日文字符，并对ASCII字符里已有的数、标点、字母赋予两个字节的编码，这就是全角字符。、</p>
-</li>
-<li><p>GBK<br>GB2312仅包含了常用汉字，没有编码生僻字以及繁体字，GBK就对其进行了扩展。只要第一个字节大于127，不管后面的字节是否大于127，就是GBK编码的字符。这两个字节的范围是：<br>第一个字节的范围是[0x81(127),0xFE(254)]，第二个字节的范围是[0x40(64),0x7E(126)]U[0x80(128),0xFE(254)]<br>GBK包含了GB2312的所有内容，提供了23940个编码，使用了21886个。</p>
-</li>
-<li><p>GB18030<br>把两个字节在GBK中还没有用完的码位用来编码一些少数民族的语言</p>
-</li>
-</ul>
-<p>（GB2312,GBK,GB18030）最大的特点是两字节长的汉字字符和一字节长的英文字符并存于同一套编码方案里(这几种编码方案，同时用1个字节和两个字节编码)，因此写的程序为了支持中文处理，必须要注意字串里的每一个字节的值，如果这个值是大于127的，那么就认为一个双字节字符集里的字符出现了。</p>
-<h4 id="3-unicode"><a href="#3-unicode" class="headerlink" title="3.unicode"></a>3.unicode</h4><p>中文采用GB类进行编码，但是其他国家也同样存在着各种编码方式，这样极其容易造成乱码。而unicode对世界上大部分的文字系统进行了整理、编码。但unicode只定义了符号的二进制代码，并没有规定这个二进制编码如何存储。若是要在计算机里存储unicode编码，有两个问题：</p>
+<h3 id="1-浏览器与Event-Loop"><a href="#1-浏览器与Event-Loop" class="headerlink" title="1. 浏览器与Event Loop"></a>1. 浏览器与Event Loop</h3><p><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop" target="_blank" rel="noopener">HTML规范</a>中对Event Loop的定义如下：</p>
+<blockquote>
+<p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, user agents must use event loops as described in this section. Each agent has an associated event loop.</p>
+</blockquote>
+<p>同时规定：</p>
 <ul>
-<li>第一个问题是如何区分unicode和ASCII，计算机如何知道三个字节代表三个符号还是一个符号。</li>
-<li>采用定长的字节表示unicode字符，比如三个或者四个，对于只用一个字节就能表示的英文字母来说，会造成很大的存储空间浪费，每个英文字母前面必然有2到3个字节是0。<br>这造成的结果是 ，出现了unicode的多种存储方式，导致unicode在很长时间内无法推广</li>
+<li>An event loop has one or more task queues. A task queue is a set of tasks.（一个event loop可以有1个或多个task queue）。</li>
+<li>Per its source field, each task is defined as coming from a specific task source. For each event loop, every task source must be associated with a specific task queue.（每个task定义时都有一个task source，从同一个task source来的task必须放到同一个task queue，从不同源来的则被添加到不同的task queue）。</li>
+<li>Tasks encapsulate algorithms that are responsible for such work as: Events,Parsing,Callbacks,Using a resource,Reacting to DOM manipulation,etc.</li>
 </ul>
-<h4 id="4-utf-8"><a href="#4-utf-8" class="headerlink" title="4.utf-8"></a>4.utf-8</h4><p>utf的含义是UCS Transfer Format，这是随着互联网的普及而诞生的统一的编码方式。utf-8是在互联网上使用最广的一种unicode的实现方式。其他方式还包括UTF-16、UTF-32，不过在互联网上基本不用。<br>utf-8的最大特点，就是它是一种变长的编码方式，使用1-4个字节表示一个符号，根据不同的符号变换字节长度。<br>其编码规则是：</p>
+<p>每个(task source对应的)task queue都保证自己队列的先进先出的执行顺序，但event loop的每个turn，是由浏览器决定从哪个task source挑选task。这允许浏览器为不同的task source设置不同的优先级，比如为用户交互设置更高优先级来使用户感觉流畅。</p>
+<h4 id="1-1-macrotask"><a href="#1-1-macrotask" class="headerlink" title="1.1 macrotask"></a>1.1 macrotask</h4><p>规范里提及的task又称macrotask，从<a href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources" target="_blank" rel="noopener">webappapis.html#generic-task-sources</a>可以看出，<br>task源包括：</p>
+<ul>
+<li>DOM 操作任务源：如元素以非阻塞方式插入文档</li>
+<li>用户交互任务源：如鼠标键盘事件。用户输入事件（如 click） 必须使用 task 队列</li>
+<li>网络任务源：如 XHR 回调</li>
+<li>history 回溯任务源：使用 history.back() 或者类似 API</li>
+</ul>
+<p>此外 setTimeout、setInterval、IndexDB 数据库操作等也是任务源。总结来说，常见的 task 任务有：</p>
+<ul>
+<li>事件回调</li>
+<li>XHR 回调</li>
+<li>IndexDB 数据库操作等 I/O</li>
+<li>setTimeout / setInterval</li>
+<li>history.back</li>
+</ul>
+<h4 id="1-2-microtask"><a href="#1-2-microtask" class="headerlink" title="1.2 microtask"></a>1.2 microtask</h4><p>从<a href="https://html.spec.whatwg.org/multipage/webappapis.html#microtask" target="_blank" rel="noopener">webappapis.html#microtask</a>可以知道，每一个 eventloop 都有一个 microtask 队列。microtask 会放在 microtask 队列而非 task 队列中。<br>一般来说，microtask 包括：</p>
+<ul>
+<li>Promise.then</li>
+<li>MutationObserver</li>
+<li>Object.observe</li>
+</ul>
+<h4 id="1-3-Processing-model"><a href="#1-3-Processing-model" class="headerlink" title="1.3 Processing model"></a>1.3 Processing model</h4><p>规范<a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model" target="_blank" rel="noopener">webappapis.html#event-loop-processing-model</a>描述了eventloop的处理过程，简述为以下步骤：</p>
 <ol>
-<li>单字节的字符，第一位统一为0，后面七位是这个符号的unicode编码，utf-8码只占用一个字节，和ASCII码完全相同。</li>
-<li>对于n（n&gt;1）个字节的字母,第一个字节的前n位设为1，第n+1位设置为0，后面字节的前两位都设为10，这n个字节的其余空位用来填空这个字符的unicode编码，高位用0补足。</li>
+<li>从 task 队列（一个或多个）中选出最老的一个 task，执行它。</li>
+<li>执行 microtask 检查点（checkpoint），执行microtask队列中的所有 microtask，直到队列为空。如果microtask又添加了新的 microtask，直接放进本队列末尾。</li>
+<li>执行UI render（可选）。<ul>
+<li>首先判断document在此时间点渲染是否会“获益”。浏览器只需保证 60Hz 的刷新率即可（在机器负荷重时还会降低刷新率），若eventloop频率过高，即使渲染了浏览器也无法及时展示。<strong>所以并不是每轮 eventloop 都会执行 UI Render</strong>。</li>
+<li>若进行UI render，执行各种渲染所需工作，如 触发 resize、scroll 事件、建立媒体查询、运行 CSS 动画等等</li>
+<li><strong>执行animation frame callbacks</strong></li>
+<li><strong>执行IntersectionObserver callback</strong></li>
+<li>渲染 UI</li>
+</ul>
+</li>
 </ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Unicode范围</th>
-<th style="text-align:left">编码格式</th>
-<th style="text-align:center">剩余位数</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">000000-00007F</td>
-<td style="text-align:left">0xxxxxxx</td>
-<td style="text-align:center">7</td>
-</tr>
-<tr>
-<td style="text-align:left">000080-0007FF</td>
-<td style="text-align:left">110xxxxx 10xxxxxx</td>
-<td style="text-align:center">11</td>
-</tr>
-<tr>
-<td style="text-align:left">000800-00FFFF</td>
-<td style="text-align:left">1110xxxx 10xxxxxx 10xxxxxx</td>
-<td style="text-align:center">16</td>
-</tr>
-<tr>
-<td style="text-align:left">010000-10FFFF</td>
-<td style="text-align:left">11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</td>
-<td style="text-align:center">21</td>
-</tr>
-</tbody>
-</table>
-<p>由此可以总结出字符用UTF-8编码的规律：</p>
-<ul>
-<li>4个字节的utf-8十六进制编码一定是F开头</li>
-<li>3个字节的utf-8十六进制编码一定是E开头</li>
-<li>2个字节的utf-8十六进制编码一定是C或者D开头</li>
-<li>1个字节的utf-8十六进制编码一定是小于8开头</li>
-</ul>
-<p>utf-16以两个字节为单位进行编码。utf-8需判断每个字节的开头标志信息，可能解析出错。而utf-16不会判断开头标志，即使错也是错一个字符，容错能力强。<br>Javascript内部，字符以utf-16的格式存储，每个字符两个字节。对于那些需要四个字节表示的unicode字符（unicode码点大于0xFFFFF），javascript会认为它们是两个字符。不过可以参考es6中关于字符串的扩展，看看是如何解决这个问题的…</p>
-<p>参考</p>
-<ul>
-<li><a href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html" target="_blank" rel="noopener">字符编码笔记：ASCII，Unicode和UTF-8 —— 阮一峰</a></li>
-</ul>
+<p>promise A+规范里规定promise不能返回自己，因为promise.then会把回调注册到本次microtask队列中，从而导致第二步中的microtask队列永远不可能为空，造成<strong>死循环</strong>。</p>
+<h4 id="1-4-microtask-的执行时机"><a href="#1-4-microtask-的执行时机" class="headerlink" title="1.4 microtask 的执行时机"></a>1.4 microtask 的执行时机</h4><p> 观察以下代码：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(() =&gt; &#123;</span><br><span class="line">  console.log(&apos;A&apos;)</span><br><span class="line">&#125;, 0)</span><br><span class="line">requestAnimationFrame(() =&gt; &#123;</span><br><span class="line">  console.log(&apos;B&apos;)</span><br><span class="line">  Promise.resolve().then(() =&gt; &#123;</span><br><span class="line">    console.log(&apos;C&apos;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p> 打印结果为：”B C A”或者”A B C”（B，C一定紧挨着输出）。从中可以知道，requestAnimationFrame 中注册的 microtask 并没有在下一轮 eventloop 的 task 之后执行，而是直接在本轮 eventloop 中紧跟着 requestAnimationFrame 执行了。也就是说一轮 eventloop 中有可能执行多次 microtask</p>
+<h3 id="2-Node与Event-Loop"><a href="#2-Node与Event-Loop" class="headerlink" title="2. Node与Event Loop"></a>2. Node与Event Loop</h3><p> <a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/" target="_blank" rel="noopener">Node</a>对Event Loop的描述如下：</p>
+<blockquote>
+<p>The event loop is what allows Node.js to perform non-blocking I/O operations — despite the fact that JavaScript is single-threaded — by offloading operations to the system kernel whenever possible.</p>
+</blockquote>
+<p> Node.js采用V8作为js的解析引擎，而I/O处理方面使用了libuv，libuv是一个基于事件驱动的跨平台抽象层，封装了不同操作系统一些底层特性，对外提供统一的API，事件循环机制也是它的内部实现。</p>
+<p> Event Loop的“读取任务队列”有6个阶段：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    ┌───────────────────────────┐</span><br><span class="line">┌─&gt;│           timers          │</span><br><span class="line">│  └─────────────┬─────────────┘</span><br><span class="line">│  ┌─────────────┴─────────────┐</span><br><span class="line">│  │     pending callbacks     │</span><br><span class="line">│  └─────────────┬─────────────┘</span><br><span class="line">│  ┌─────────────┴─────────────┐</span><br><span class="line">│  │       idle, prepare       │</span><br><span class="line">│  └─────────────┬─────────────┘      ┌───────────────┐</span><br><span class="line">│  ┌─────────────┴─────────────┐      │   incoming:   │</span><br><span class="line">│  │           poll            │&lt;─────┤  connections, │</span><br><span class="line">│  └─────────────┬─────────────┘      │   data, etc.  │</span><br><span class="line">│  ┌─────────────┴─────────────┐      └───────────────┘</span><br><span class="line">│  │           check           │</span><br><span class="line">│  └─────────────┬─────────────┘</span><br><span class="line">│  ┌─────────────┴─────────────┐</span><br><span class="line">└──┤      close callbacks      │</span><br><span class="line">   └───────────────────────────┘</span><br></pre></td></tr></table></figure></p>
+<p>（未完待续）</p>
 
         </div>
         
@@ -347,10 +339,10 @@
     <div class="new-meta-box">
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-08-04T21:50:28+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2019-09-14T23:29:34+08:00">
   <a class="notlink">
     <i class="fas fa-clock" aria-hidden="true"></i>
-    <p>最后更新于 Aug 4, 2019</p>
+    <p>最后更新于 Sep 14, 2019</p>
   </a>
 </div>
 
@@ -359,7 +351,7 @@
         
           
   
-  <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/字符编码/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>字符编码</p></a></div>
+  <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Javascript/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Javascript</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/blog/tags/Node/" rel="nofollow"><i class="fas fa-hashtag" aria-hidden="true"></i>&nbsp;<p>Node</p></a></div>
 
 
         
@@ -370,7 +362,7 @@
   <div class="-mob-share-list share-body">
     
       
-        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer" href="http://connect.qq.com/widget/shareqq/index.html?url=https://rhliu228.github.io./CharacterEncoding/&title=字符编码归纳 | Zoe的博客&summary=这篇文章主要是对ASCII，UTF-8，Unicode，GBK编码等概念进行阐述并加以区别。">
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer" href="http://connect.qq.com/widget/shareqq/index.html?url=https://rhliu228.github.io./EventLoop/&title=比较Node和浏览器的Event Loop | Zoe的博客&summary=一直以为大致搞懂浏览器的eventLoop就差不多了，直到我看了《Node.js调试指南》后，才发现把浏览器和Node环境的eventLoop混在一起谈是不合适的。虽然它们的任务源确实存在很大区别，但更重要的是，Node下eventloop的“读取任务队列”划分为6个阶段，从而导致两者在优先级队列的执行次序上有很大不同。 这篇文章主要阐述浏览器和node环境的eventloop异同。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
           
@@ -378,7 +370,7 @@
       
     
       
-        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://rhliu228.github.io./CharacterEncoding/&title=字符编码归纳 | Zoe的博客&summary=这篇文章主要是对ASCII，UTF-8，Unicode，GBK编码等概念进行阐述并加以区别。">
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://rhliu228.github.io./EventLoop/&title=比较Node和浏览器的Event Loop | Zoe的博客&summary=一直以为大致搞懂浏览器的eventLoop就差不多了，直到我看了《Node.js调试指南》后，才发现把浏览器和Node环境的eventLoop混在一起谈是不合适的。虽然它们的任务源确实存在很大区别，但更重要的是，Node下eventloop的“读取任务队列”划分为6个阶段，从而导致两者在优先级队列的执行次序上有很大不同。 这篇文章主要阐述浏览器和node环境的eventloop异同。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
           
@@ -386,7 +378,7 @@
       
     
       
-        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer" href="http://service.weibo.com/share/share.php?url=https://rhliu228.github.io./CharacterEncoding/&title=字符编码归纳 | Zoe的博客&summary=这篇文章主要是对ASCII，UTF-8，Unicode，GBK编码等概念进行阐述并加以区别。">
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer" href="http://service.weibo.com/share/share.php?url=https://rhliu228.github.io./EventLoop/&title=比较Node和浏览器的Event Loop | Zoe的博客&summary=一直以为大致搞懂浏览器的eventLoop就差不多了，直到我看了《Node.js调试指南》后，才发现把浏览器和Node环境的eventLoop混在一起谈是不合适的。虽然它们的任务源确实存在很大区别，但更重要的是，Node下eventloop的“读取任务队列”划分为6个阶段，从而导致两者在优先级队列的执行次序上有很大不同。 这篇文章主要阐述浏览器和node环境的eventloop异同。">
           
             <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
           
@@ -408,40 +400,21 @@
         
             <div class="prev-next">
                 
-                    <section class="prev">
-                        <span class="art-item-left">
-                            <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
-                            <h4>
-                                <a href="/ES6Module/" rel="prev" title="webpack构建 ES2015+ module">
-                                  
-                                      webpack构建 ES2015+ module
-                                  
-                                </a>
-                            </h4>
-                            
-                                
-                                <h6 class="tags">
-                                    <a class="tag" href="/blog/tags/webpack/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>webpack</a> <a class="tag" href="/blog/tags/babel/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>babel</a> <a class="tag" href="/blog/tags/vue-cli3/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>vue-cli3</a>
-                                </h6>
-                            
-                        </span>
-                    </section>
-                
                 
                     <section class="next">
                         <span class="art-item-right" aria-hidden="true">
                             <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
                             <h4>
-                                <a href="/NumberInJs/" rel="prev" title="深入理解Javascript中的数字">
+                                <a href="/Performance/" rel="prev" title="利用Chrome开发者工具探讨运行时性能">
                                     
-                                        深入理解Javascript中的数字
+                                        利用Chrome开发者工具探讨运行时性能
                                     
                                 </a>
                             </h4>
                             
                                 
                                 <h6 class="tags">
-                                    <a class="tag" href="/blog/tags/Javascript/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>Javascript</a>
+                                    <a class="tag" href="/blog/tags/Performance/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>Performance</a> <a class="tag" href="/blog/tags/Javascript/"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i>Javascript</a>
                                 </h6>
                             
                         </span>
@@ -472,7 +445,7 @@
 
   <script>
     window.subData = {
-      title: '字符编码归纳',
+      title: '比较Node和浏览器的Event Loop',
       tools: true
     }
   </script>
@@ -530,7 +503,7 @@
 </header>
 
     <div class="content pure">
-      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-ASCII"><span class="toc-text">1. ASCII</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-中文编码"><span class="toc-text">2. 中文编码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-unicode"><span class="toc-text">3.unicode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-utf-8"><span class="toc-text">4.utf-8</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-浏览器与Event-Loop"><span class="toc-text">1. 浏览器与Event Loop</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-macrotask"><span class="toc-text">1.1 macrotask</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-microtask"><span class="toc-text">1.2 microtask</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-Processing-model"><span class="toc-text">1.3 Processing model</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-microtask-的执行时机"><span class="toc-text">1.4 microtask 的执行时机</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Node与Event-Loop"><span class="toc-text">2. Node与Event Loop</span></a></li></ol>
     </div>
   </section>
 
